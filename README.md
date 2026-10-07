@@ -4,6 +4,22 @@
 
 当前阶段的实现、理解、验证证据与下一步判断见 [学习总结](LEARNING_SUMMARY.md)。
 
+现已增加并行保留的 [Vercel AI SDK 版本](vercel_agent/README.md)：两版共用 `tools.py`，手写版用于理解循环，SDK 版用于比较框架接管循环后的差异。[五组真实模型对比](reports/vercel-sdk-comparison.md)记录了调用次数、Token 和人工验收结果。
+
+现有 Python 环境就绪、Node.js 22+ 已安装时，可直接体验 SDK 版：
+
+```sh
+cd vercel_agent
+npm ci
+npm run chat
+```
+
+SDK 入口自动读取项目 `.env`，使用同一个 DeepSeek 密钥。
+
+已加入 [最薄 Harness 的使用与原理](vercel_agent/HARNESS.md)：显式选择 Skill，复用 SDK Loop 和四个工具执行任务，每次保存独立结果与执行记录。在 `vercel_agent` 目录运行 `npm run harness -- --list` 查看可用流程。
+
+当前阶段的实现、理解、验证结论和限制见 [SDK 与 Harness 阶段总结](SDK_HARNESS_SUMMARY.md)。
+
 ## 运行
 
 当前 `.venv` 已安装依赖。首次搭建时：

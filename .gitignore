@@ -8,3 +8,6 @@ __pycache__/
 .commandcode/
 reports/last-run.json
 reports/module-6-3-browser-source.json
+node_modules/
+reports/vercel-last-run.json
+reports/harness/

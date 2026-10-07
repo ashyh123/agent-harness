@@ -1,0 +1,24 @@
+{
+  "name": "minimal-agent-vercel-comparison",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "chat": "tsx cli.ts",
+    "harness": "tsx harness_cli.ts",
+    "compare": "tsx compare.ts",
+    "verify:webpage": "tsx verify_webpage.ts",
+    "test": "tsx --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "ai": "7.0.130",
+    "@ai-sdk/deepseek": "3.0.61"
+  },
+  "devDependencies": {
+    "tsx": "4.23.15",
+    "typescript": "7.0.2",
+    "@types/node": "22.19.15"
+  }
+}

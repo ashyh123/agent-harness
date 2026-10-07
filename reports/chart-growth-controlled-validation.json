@@ -1,0 +1,625 @@
+{
+  "date": "2026-10-07T12:28:33.473Z",
+  "mode": "真实主模型 + 固定视觉工具返回值 + 真实计算工具",
+  "limitations": "未使用异常图片进行真实视觉识别；直接使用与 Harness 相同的 Skill 指令合并方式调用 VercelLoop，不验证外壳落盘流程。",
+  "criteria": [
+    "调用 analyze_image",
+    "零基数、模糊、缺失、单位不同均不调用 calculate，并说明具体原因",
+    "下降样例依次计算 -30、-0.2、-20，输出 -20.00% 并说明下降",
+    "输出和语义仍需人工核对"
+  ],
+  "cases": [
+    {
+      "name": "零基数",
+      "analysis": "图表清晰。2024 年：0 units；2025 年：150 units。标签、数值、单位均直接可见。",
+      "should_calculate": false,
+      "checks": {
+        "runtime_completed": true,
+        "read_image": true,
+        "expected_calculations": true
+      },
+      "result": {
+        "model_requests": 3,
+        "tool_calls": 2,
+        "outer_requests": 3,
+        "events": [
+          {
+            "type": "model",
+            "kind": "vercel",
+            "request": 1,
+            "elapsed_seconds": 1.787,
+            "usage": {
+              "prompt_tokens": 1411,
+              "completion_tokens": 95,
+              "total_tokens": 1506,
+              "prompt_tokens_details": {
+                "cached_tokens": 1152
+              },
+              "prompt_cache_hit_tokens": 1152,
+              "prompt_cache_miss_tokens": 259
+            },
+            "finish_reason": "tool_calls"
+          },
+          {
+            "type": "tool",
+            "name": "analyze_image",
+            "arguments": {
+              "image_source": "images/chart-growth-controlled-fixture.png",
+              "question": "请读取图表中 2024 年和 2025 年对应的数值、单位以及标签。请说明数字是否清晰可辨。"
+            },
+            "elapsed_seconds": 0,
+            "result": {
+              "image_source": "images/chart-growth-controlled-fixture.png",
+              "analysis": "图表清晰。2024 年：0 units；2025 年：150 units。标签、数值、单位均直接可见。"
+            },
+            "tool_call_id": "call_00_gZLZrP3Q8xQrqyPcUTbV4792"
+          },
+          {
+            "type": "model",
+            "kind": "vercel",
+            "request": 2,
+            "elapsed_seconds": 1.617,
+            "usage": {
+              "prompt_tokens": 1561,
+              "completion_tokens": 143,
+              "total_tokens": 1704,
+              "prompt_tokens_details": {
+                "cached_tokens": 1408
+              },
+              "prompt_cache_hit_tokens": 1408,
+              "prompt_cache_miss_tokens": 153
+            },
+            "finish_reason": "tool_calls"
+          },
+          {
+            "type": "tool",
+            "name": "analyze_image",
+            "arguments": {
+              "image_source": "images/chart-growth-controlled-fixture.png",
+              "question": "请再次仔细核对图表中 2024 年柱子的数值。它是 0 还是别的数字（例如 100、120、200）？请说明刻度轴的范围和单位，并确认 2024 与 2025 两个数值分别是多少。"
+            },
+            "elapsed_seconds": 0,
+            "result": {
+              "image_source": "images/chart-growth-controlled-fixture.png",
+              "analysis": "图表清晰。2024 年：0 units；2025 年：150 units。标签、数值、单位均直接可见。"
+            },
+            "tool_call_id": "call_00_DQ3echv6jopv7rk0Sh9i9598"
+          },
+          {
+            "type": "model",
+            "kind": "vercel",
+            "request": 3,
+            "elapsed_seconds": 2.43,
+            "usage": {
+              "prompt_tokens": 1759,
+              "completion_tokens": 296,
+              "total_tokens": 2055,
+              "prompt_tokens_details": {
+                "cached_tokens": 1536
+              },
+              "prompt_cache_hit_tokens": 1536,
+              "prompt_cache_miss_tokens": 223
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "answer": "两次独立读取结果一致，但 2024 年数值为 0，无法按常规公式计算增长率，因此不执行除法。\n\n## 识别结果\n\n| 年份或项目 | 识别数值 | 单位 |\n|---|---|---|\n| 2024 | 0 | units |\n| 2025 | 150 | units |\n\n两次调用 `analyze_image` 的读数一致（均报告数值与单位直接可见，无不确定性），2024 年为 **0 units**。\n\n## 计算公式\n\n增长率 = (新值 − 旧值) ÷ 旧值 × 100\n\n代入：旧值（2024）= 0，新值（2025）= 150 → (150 − 0) ÷ 0 × 100\n\n## 结论：无法计算\n\n**基数为零，无法按常规公式计算增长率。** 旧值为 0 时公式要求除以 0，该运算未定义，因此本次未调用 `calculate` 执行除法，也不返回任何百分比数值。\n\n可确认的原始信息仅为：2024 年 0 units → 2025 年 150 units，即绝对增加量为 150 units。\n\n如需得到百分比增长率，请补充 2024 年可比较的非零基数（或提供另一份含非零基期的数据）。另外，如需核对图像读取是否与原图一致，可由你对照原图和 run.json 进行人工验收。",
+        "error": null,
+        "total_tokens": 5265,
+        "sdk_steps": [
+          {
+            "finish_reason": "tool-calls",
+            "tool_names": [
+              "analyze_image"
+            ],
+            "tool_errors": 0
+          },
+          {
+            "finish_reason": "tool-calls",
+            "tool_names": [
+              "analyze_image"
+            ],
+            "tool_errors": 0
+          },
+          {
+            "finish_reason": "stop",
+            "tool_names": [],
+            "tool_errors": 0
+          }
+        ],
+        "compact_retry_used": false,
+        "output_truncated": false
+      },
+      "manual_review": {
+        "main_flow_passed": true,
+        "strict_review_passed": false,
+        "finding": "没有 calculate 调用，也没有给出百分比；但额外重复读图，并给出绝对增加量 150，缺少算术工具执行记录。第二次读图问题不同，不视为重复同一无效调用的已证实违约。"
+      }
+    },
+    {
+      "name": "读数模糊",
+      "analysis": "2024 年：120 units，清晰；2025 年：数字模糊，可能是 150 或 180，无法确定。",
+      "should_calculate": false,
+      "checks": {
+        "runtime_completed": true,
+        "read_image": true,
+        "expected_calculations": true
+      },
+      "result": {
+        "model_requests": 2,
+        "tool_calls": 1,
+        "outer_requests": 2,
+        "events": [
+          {
+            "type": "model",
+            "kind": "vercel",
+            "request": 1,
+            "elapsed_seconds": 1.595,
+            "usage": {
+              "prompt_tokens": 1411,
+              "completion_tokens": 100,
+              "total_tokens": 1511,
+              "prompt_tokens_details": {
+                "cached_tokens": 1277
+              },
+              "prompt_cache_hit_tokens": 1277,
+              "prompt_cache_miss_tokens": 134
+            },
+            "finish_reason": "tool_calls"
+          },
+          {
+            "type": "tool",
+            "name": "analyze_image",
+            "arguments": {
+              "image_source": "images/chart-growth-controlled-fixture.png",
+              "question": "请读出图中 2024 年和 2025 年对应的数值、单位，以及图表标题和坐标轴标签。数值是否清晰可辨？"
+            },
+            "elapsed_seconds": 0,
+            "result": {
+              "image_source": "images/chart-growth-controlled-fixture.png",
+              "analysis": "2024 年：120 units，清晰；2025 年：数字模糊，可能是 150 或 180，无法确定。"
+            },
+            "tool_call_id": "call_00_rpfUswYJHNywIkH5o7ll2726"
+          },
+          {
+            "type": "model",
+            "kind": "vercel",
+            "request": 2,
+            "elapsed_seconds": 1.745,
+            "usage": {
+              "prompt_tokens": 1567,
+              "completion_tokens": 186,
+              "total_tokens": 1753,
+              "prompt_tokens_details": {
+                "cached_tokens": 1408
+              },
+              "prompt_cache_hit_tokens": 1408,
+              "prompt_cache_miss_tokens": 159
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "answer": "2025 年的读数无法确定，因此暂停计算。\n\n| 年份 / 项目 | 识别数值 | 单位 |\n|---|---|---|\n| 2024 | 120（清晰） | units |\n| 2025 | 150 或 180（模糊，不能确定） | units |\n\n- 图表标题：未能识别（工具未返回）\n- 坐标轴标签：未能识别（工具未返回）\n\n**无法计算的原因**：2025 年数值存在两个可能的读数（150 或 180），无法唯一确定，按流程应暂停计算，不做猜测。\n\n**需要补充的信息**：请提供更清晰的图片，或直接告知 2025 年的准确数值（以及图表标题、单位，若有）。拿到确定数值后，我会用 (新值 − 旧值) / 旧值 × 100 分步计算并给出两位小数的结果。",
+        "error": null,
+        "total_tokens": 3264,
+        "sdk_steps": [
+          {
+            "finish_reason": "tool-calls",
+            "tool_names": [
+              "analyze_image"
+            ],
+            "tool_errors": 0
+          },
+          {
+            "finish_reason": "stop",
+            "tool_names": [],
+            "tool_errors": 0
+          }
+        ],
+        "compact_retry_used": false,
+        "output_truncated": false
+      },
+      "manual_review": {
+        "main_flow_passed": true,
+        "strict_review_passed": false,
+        "finding": "保留 150/180 的不确定性并暂停计算；但工具没有返回标题或轴标签，不足以断言它们未能识别。"
+      }
+    },
+    {
+      "name": "数值缺失",
+      "analysis": "2024 年：120 units。2025 年有标签但未显示数值，无法确定。",
+      "should_calculate": false,
+      "checks": {
+        "runtime_completed": true,
+        "read_image": true,
+        "expected_calculations": true
+      },
+      "result": {
+        "model_requests": 2,
+        "tool_calls": 1,
+        "outer_requests": 2,
+        "events": [
+          {
+            "type": "model",
+            "kind": "vercel",
+            "request": 1,
+            "elapsed_seconds": 1.263,
+            "usage": {
+              "prompt_tokens": 1411,
+              "completion_tokens": 92,
+              "total_tokens": 1503,
+              "prompt_tokens_details": {
+                "cached_tokens": 1277
+              },
+              "prompt_cache_hit_tokens": 1277,
+              "prompt_cache_miss_tokens": 134
+            },
+            "finish_reason": "tool_calls"
+          },
+          {
+            "type": "tool",
+            "name": "analyze_image",
+            "arguments": {
+              "image_source": "images/chart-growth-controlled-fixture.png",
+              "question": "请列出图中 2024 和 2025 对应的数值及单位，并说明标签是否清晰可读。"
+            },
+            "elapsed_seconds": 0,
+            "result": {
+              "image_source": "images/chart-growth-controlled-fixture.png",
+              "analysis": "2024 年：120 units。2025 年有标签但未显示数值，无法确定。"
+            },
+            "tool_call_id": "call_00_xcTIml7NgyEvp3kLSXIs6500"
+          },
+          {
+            "type": "model",
+            "kind": "vercel",
+            "request": 2,
+            "elapsed_seconds": 1.832,
+            "usage": {
+              "prompt_tokens": 1552,
+              "completion_tokens": 206,
+              "total_tokens": 1758,
+              "prompt_tokens_details": {
+                "cached_tokens": 1408
+              },
+              "prompt_cache_hit_tokens": 1408,
+              "prompt_cache_miss_tokens": 144
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "answer": "## 识别结果\n\n| 年份 | 识别数值 | 单位 |\n|------|---------|------|\n| 2024 | 120 | units |\n| 2025 | 标签存在，数值缺失/不可读 | — |\n\n## 状态：无法计算\n\n- **原因**：图中 2025 年只有标签、没有可读数值，缺少计算增长率的必要输入，因此暂停计算。\n- 图片读取本身成功，2024 年读数（120 units）明确；2025 年数据不确定，未做任何推测。\n\n## 需要补充\n\n请提供 2025 年的数值（清晰的图片或直接给数字），并确认两年单位一致（均为 units）。拿到后我会按以下步骤计算：\n\n1. 新值 − 旧值\n2. 结果 ÷ 旧值（120）\n3. × 100，保留两位小数\n\n若 2025 数值实际低于 2024，我会如实表述为下降而非增长。",
+        "error": null,
+        "total_tokens": 3261,
+        "sdk_steps": [
+          {
+            "finish_reason": "tool-calls",
+            "tool_names": [
+              "analyze_image"
+            ],
+            "tool_errors": 0
+          },
+          {
+            "finish_reason": "stop",
+            "tool_names": [],
+            "tool_errors": 0
+          }
+        ],
+        "compact_retry_used": false,
+        "output_truncated": false
+      },
+      "manual_review": {
+        "main_flow_passed": true,
+        "strict_review_passed": true,
+        "finding": "保留已知 120，说明 2025 数值缺失，不计算，请求补充。"
+      }
+    },
+    {
+      "name": "单位不一致",
+      "analysis": "图表清晰。2024 年：120 元；2025 年：150 人。两个标签和单位都清楚，但单位不同。",
+      "should_calculate": false,
+      "checks": {
+        "runtime_completed": true,
+        "read_image": true,
+        "expected_calculations": true
+      },
+      "result": {
+        "model_requests": 2,
+        "tool_calls": 1,
+        "outer_requests": 2,
+        "events": [
+          {
+            "type": "model",
+            "kind": "vercel",
+            "request": 1,
+            "elapsed_seconds": 1.449,
+            "usage": {
+              "prompt_tokens": 1411,
+              "completion_tokens": 102,
+              "total_tokens": 1513,
+              "prompt_tokens_details": {
+                "cached_tokens": 1277
+              },
+              "prompt_cache_hit_tokens": 1277,
+              "prompt_cache_miss_tokens": 134
+            },
+            "finish_reason": "tool_calls"
+          },
+          {
+            "type": "tool",
+            "name": "analyze_image",
+            "arguments": {
+              "image_source": "images/chart-growth-controlled-fixture.png",
+              "question": "请读出图中每个年份/项目对应的数值和单位，特别是 2024 和 2025 的数值。请说明读数是否清晰。"
+            },
+            "elapsed_seconds": 0,
+            "result": {
+              "image_source": "images/chart-growth-controlled-fixture.png",
+              "analysis": "图表清晰。2024 年：120 元；2025 年：150 人。两个标签和单位都清楚，但单位不同。"
+            },
+            "tool_call_id": "call_00_SNnA5dBsAYPJ3y2Dy35P7158"
+          },
+          {
+            "type": "model",
+            "kind": "vercel",
+            "request": 2,
+            "elapsed_seconds": 2.064,
+            "usage": {
+              "prompt_tokens": 1572,
+              "completion_tokens": 164,
+              "total_tokens": 1736,
+              "prompt_tokens_details": {
+                "cached_tokens": 1408
+              },
+              "prompt_cache_hit_tokens": 1408,
+              "prompt_cache_miss_tokens": 164
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "answer": "| 年份 | 识别数值 | 单位 |\n|---|---|---|\n| 2024 | 120 | 元 |\n| 2025 | 150 | 人 |\n\n读数是清晰的，但两个年份的**单位不一致**（元 vs 人），属于不可直接比较的不同量纲，因此无法计算增长率。\n\n按流程要求，此时应暂停计算，不执行除零或跨单位相除。请补充以下任一信息：\n\n- 确认哪一个单位正确（均为元，或均为“人”）；\n- 或提供同一单位下的 2024、2025 两个数值。\n\n拿到单位一致的数据后，我会按 `(2025 − 2024) / 2024 × 100` 分步调用计算工具，给出保留两位小数的百分比。",
+        "error": null,
+        "total_tokens": 3249,
+        "sdk_steps": [
+          {
+            "finish_reason": "tool-calls",
+            "tool_names": [
+              "analyze_image"
+            ],
+            "tool_errors": 0
+          },
+          {
+            "finish_reason": "stop",
+            "tool_names": [],
+            "tool_errors": 0
+          }
+        ],
+        "compact_retry_used": false,
+        "output_truncated": false
+      },
+      "manual_review": {
+        "main_flow_passed": true,
+        "strict_review_passed": true,
+        "finding": "保留元/人的差异，不跨单位计算，请求可比较数据。"
+      }
+    },
+    {
+      "name": "数值下降",
+      "analysis": "图表清晰。2024 年：150 units；2025 年：120 units。标签、数值、单位均直接可见。",
+      "should_calculate": true,
+      "checks": {
+        "runtime_completed": true,
+        "read_image": true,
+        "expected_calculations": true
+      },
+      "result": {
+        "model_requests": 5,
+        "tool_calls": 4,
+        "outer_requests": 5,
+        "events": [
+          {
+            "type": "model",
+            "kind": "vercel",
+            "request": 1,
+            "elapsed_seconds": 1.288,
+            "usage": {
+              "prompt_tokens": 1411,
+              "completion_tokens": 92,
+              "total_tokens": 1503,
+              "prompt_tokens_details": {
+                "cached_tokens": 1277
+              },
+              "prompt_cache_hit_tokens": 1277,
+              "prompt_cache_miss_tokens": 134
+            },
+            "finish_reason": "tool_calls"
+          },
+          {
+            "type": "tool",
+            "name": "analyze_image",
+            "arguments": {
+              "image_source": "images/chart-growth-controlled-fixture.png",
+              "question": "请提取图表中 2024 年和 2025 年的数值、单位及标签，并说明读数是否清晰。"
+            },
+            "elapsed_seconds": 0,
+            "result": {
+              "image_source": "images/chart-growth-controlled-fixture.png",
+              "analysis": "图表清晰。2024 年：150 units；2025 年：120 units。标签、数值、单位均直接可见。"
+            },
+            "tool_call_id": "call_00_TanwgQEAhepQs3IPnktQ0418"
+          },
+          {
+            "type": "model",
+            "kind": "vercel",
+            "request": 2,
+            "elapsed_seconds": 1.207,
+            "usage": {
+              "prompt_tokens": 1558,
+              "completion_tokens": 69,
+              "total_tokens": 1627,
+              "prompt_tokens_details": {
+                "cached_tokens": 1408
+              },
+              "prompt_cache_hit_tokens": 1408,
+              "prompt_cache_miss_tokens": 150
+            },
+            "finish_reason": "tool_calls"
+          },
+          {
+            "type": "tool",
+            "name": "calculate",
+            "arguments": {
+              "operation": "subtract",
+              "a": 120,
+              "b": 150
+            },
+            "elapsed_seconds": 0.002,
+            "result": {
+              "operation": "subtract",
+              "a": 120,
+              "b": 150,
+              "result": -30
+            },
+            "tool_call_id": "call_00_mjsiSHjIox7YQxBBXCZb0659"
+          },
+          {
+            "type": "model",
+            "kind": "vercel",
+            "request": 3,
+            "elapsed_seconds": 1.236,
+            "usage": {
+              "prompt_tokens": 1657,
+              "completion_tokens": 69,
+              "total_tokens": 1726,
+              "prompt_tokens_details": {
+                "cached_tokens": 1408
+              },
+              "prompt_cache_hit_tokens": 1408,
+              "prompt_cache_miss_tokens": 249
+            },
+            "finish_reason": "tool_calls"
+          },
+          {
+            "type": "tool",
+            "name": "calculate",
+            "arguments": {
+              "operation": "divide",
+              "a": -30,
+              "b": 150
+            },
+            "elapsed_seconds": 0,
+            "result": {
+              "operation": "divide",
+              "a": -30,
+              "b": 150,
+              "result": -0.2
+            },
+            "tool_call_id": "call_00_ebBU0KSmWdLxUINYkiot4174"
+          },
+          {
+            "type": "model",
+            "kind": "vercel",
+            "request": 4,
+            "elapsed_seconds": 1.375,
+            "usage": {
+              "prompt_tokens": 1758,
+              "completion_tokens": 72,
+              "total_tokens": 1830,
+              "prompt_tokens_details": {
+                "cached_tokens": 1536
+              },
+              "prompt_cache_hit_tokens": 1536,
+              "prompt_cache_miss_tokens": 222
+            },
+            "finish_reason": "tool_calls"
+          },
+          {
+            "type": "tool",
+            "name": "calculate",
+            "arguments": {
+              "operation": "multiply",
+              "a": -0.2,
+              "b": 100
+            },
+            "elapsed_seconds": 0,
+            "result": {
+              "operation": "multiply",
+              "a": -0.2,
+              "b": 100,
+              "result": -20
+            },
+            "tool_call_id": "call_00_OaqcjWaP1tvJT7NuMp6n7384"
+          },
+          {
+            "type": "model",
+            "kind": "vercel",
+            "request": 5,
+            "elapsed_seconds": 1.494,
+            "usage": {
+              "prompt_tokens": 1863,
+              "completion_tokens": 173,
+              "total_tokens": 2036,
+              "prompt_tokens_details": {
+                "cached_tokens": 1664
+              },
+              "prompt_cache_hit_tokens": 1664,
+              "prompt_cache_miss_tokens": 199
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "answer": "## 识别结果\n\n| 年份 | 识别数值 | 单位 |\n|---|---|---|\n| 2024 | 150 | units |\n| 2025 | 120 | units |\n\n读数清晰，标签、数值、单位均直接可见，无不确定项。\n\n## 计算过程\n\n公式：(新值 − 旧值) ÷ 旧值 × 100\n\n1. 120 − 150 = **−30**\n2. −30 ÷ 150 = **−0.2**\n3. −0.2 × 100 = **−20**\n\n## 结论\n\n从 2024 到 2025 的变化率为 **−20.00%**，即**下降 20.00%**（非增长）。\n\n注：这是运行结果，验收需由你结合原图与 run.json 核对。",
+        "error": null,
+        "total_tokens": 8722,
+        "sdk_steps": [
+          {
+            "finish_reason": "tool-calls",
+            "tool_names": [
+              "analyze_image"
+            ],
+            "tool_errors": 0
+          },
+          {
+            "finish_reason": "tool-calls",
+            "tool_names": [
+              "calculate"
+            ],
+            "tool_errors": 0
+          },
+          {
+            "finish_reason": "tool-calls",
+            "tool_names": [
+              "calculate"
+            ],
+            "tool_errors": 0
+          },
+          {
+            "finish_reason": "tool-calls",
+            "tool_names": [
+              "calculate"
+            ],
+            "tool_errors": 0
+          },
+          {
+            "finish_reason": "stop",
+            "tool_names": [],
+            "tool_errors": 0
+          }
+        ],
+        "compact_retry_used": false,
+        "output_truncated": false
+      },
+      "manual_review": {
+        "main_flow_passed": true,
+        "strict_review_passed": true,
+        "finding": "实际调用三次 calculate，返回 -30、-0.2、-20；最终 -20.00%，明确下降。"
+      }
+    }
+  ],
+  "manual_review": {
+    "overall_strict_passed": false,
+    "main_flow_passed": true,
+    "report": "reports/chart-growth-skill-evaluation.md",
+    "note": "固定返回值测试不证明真实视觉识别可靠性。单次采样不保证后续运行相同行为。"
+  }
+}
