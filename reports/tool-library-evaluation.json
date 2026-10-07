@@ -1,0 +1,635 @@
+[
+  {
+    "case": "普通问候",
+    "prompt": "你好，请简短回复。",
+    "answer": "你好！有什么可以帮你的？",
+    "error": null,
+    "model_requests": 1,
+    "tool_calls": 0,
+    "total_tokens": 956,
+    "tool_errors": [],
+    "output_truncated": false,
+    "events": [
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 1,
+        "usage": {
+          "completion_tokens": 7,
+          "prompt_tokens": 949,
+          "total_tokens": 956,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 949
+        },
+        "finish_reason": "stop",
+        "elapsed_seconds": 2.048
+      }
+    ],
+    "logs": "[模型请求 1/5]\n"
+  },
+  {
+    "case": "精确计算",
+    "prompt": "请使用计算工具算出 123 乘以 456，简短回答。",
+    "answer": "123 × 456 = 56088",
+    "error": null,
+    "model_requests": 2,
+    "tool_calls": 1,
+    "total_tokens": 2105,
+    "tool_errors": [],
+    "output_truncated": false,
+    "events": [
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 1,
+        "usage": {
+          "completion_tokens": 69,
+          "prompt_tokens": 958,
+          "total_tokens": 1027,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 768
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 190
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.339
+      },
+      {
+        "type": "tool",
+        "name": "calculate",
+        "arguments": {
+          "operation": "multiply",
+          "a": 123.0,
+          "b": 456.0
+        },
+        "elapsed_seconds": 0.001,
+        "result": {
+          "operation": "multiply",
+          "a": 123.0,
+          "b": 456.0,
+          "result": 56088.0
+        }
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 2,
+        "usage": {
+          "completion_tokens": 8,
+          "prompt_tokens": 1070,
+          "total_tokens": 1078,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 896
+          },
+          "prompt_cache_hit_tokens": 896,
+          "prompt_cache_miss_tokens": 174
+        },
+        "finish_reason": "stop",
+        "elapsed_seconds": 1.132
+      }
+    ],
+    "logs": "[模型请求 1/5]\n[工具] calculate 参数：{\"operation\": \"multiply\", \"a\": 123, \"b\": 456}\n[工具结果] {\"operation\": \"multiply\", \"a\": 123.0, \"b\": 456.0, \"result\": 56088.0}\n[模型请求 2/5]\n"
+  },
+  {
+    "case": "网页搜索",
+    "prompt": "用 web_search 搜索 Hugging Face Agents Course 官方课程，最多返回两条搜索结果，给出官方入口 URL。",
+    "answer": "搜索返回两条结果：\n\n1. **GitHub 仓库**：The Hugging Face Agents Course — https://github.com/huggingface/agents-course\n2. **邮件订阅注册页**：The Hugging Face AI Agents Course — https://huggingface.us17.list-manage.com/subscribe?u=7f57e683fa28b51bfc493d048&id=9ed45a3ef6\n\n**官方入口 URL**：课程主要官方站为 https://huggingface.co/learn/agents-course（该课程通常以此为准）。不过本次搜索结果中并未直接返回该 learn 域名链接，仅返回了 GitHub 仓库与其注册页；建议以 GitHub 仓库中的链接进一步确认真实课程入口。",
+    "error": null,
+    "model_requests": 2,
+    "tool_calls": 1,
+    "total_tokens": 2467,
+    "tool_errors": [],
+    "output_truncated": false,
+    "events": [
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 1,
+        "usage": {
+          "completion_tokens": 70,
+          "prompt_tokens": 967,
+          "total_tokens": 1037,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 768
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 199
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.301
+      },
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "Hugging Face Agents Course official",
+          "max_results": 2
+        },
+        "elapsed_seconds": 1.97,
+        "result": {
+          "provider": "duckduckgo",
+          "results": [
+            {
+              "title": "The Hugging Face Agents Course - GitHub",
+              "url": "https://github.com/huggingface/agents-course",
+              "snippet": "The Hugging Face Agents Course If you like the course, don't hesitate to ⭐ star this repository. This helps us to make the course more visible 🤗."
+            },
+            {
+              "title": "The Hugging Face AI Agents Course",
+              "url": "https://huggingface.us17.list-manage.com/subscribe?u=7f57e683fa28b51bfc493d048&id=9ed45a3ef6",
+              "snippet": "The Hugging Face AI Agents Course 🤗 Register now for the Hugging Face Agents Course 🤗! In this free course, you will: 📖 Learn the basics of Agents from scratch. 🕵️ Build your own Agents using the latest libraries and tools. 🎓 Earn a certificate of completion to showcase your achievement."
+            }
+          ],
+          "message": "找到搜索结果"
+        }
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 2,
+        "usage": {
+          "completion_tokens": 159,
+          "prompt_tokens": 1271,
+          "total_tokens": 1430,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 1024
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 247
+        },
+        "finish_reason": "stop",
+        "elapsed_seconds": 1.79
+      }
+    ],
+    "logs": "[模型请求 1/5]\n[工具] web_search 参数：{\"query\": \"Hugging Face Agents Course official\", \"max_results\": 2}\n[工具结果] {\"provider\": \"duckduckgo\", \"results\": [{\"title\": \"The Hugging Face Agents Course - GitHub\", \"url\": \"https://github.com/huggingface/agents-course\", \"snippet\": \"The Hugging Face Agents Course If you like the course, don't hesitate to ⭐ star this repository. This helps us to make the course more visible 🤗.\"}, {\"title\": \"The Hugging Face AI Agents Course\", \"url\": \"https://huggingface.us17.list-manage.\n[模型请求 2/5]\n"
+  },
+  {
+    "case": "网页读取",
+    "prompt": "请直接读取 https://example.com/ 的正文，简短说明这个网站的用途，并附来源 URL。",
+    "answer": "页面标题为 \"Example Domain\"，正文说明：该域名用于文档示例，无需授权即可使用；它不是一个真实服务，不建议依赖它做测试和监控。\n\n用途：作为示例/示范用途的保留域名，供文档和教程中演示，不提供实际功能。\n\n来源：https://example.com/",
+    "error": null,
+    "model_requests": 2,
+    "tool_calls": 1,
+    "total_tokens": 2149,
+    "tool_errors": [],
+    "output_truncated": false,
+    "events": [
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 1,
+        "usage": {
+          "completion_tokens": 43,
+          "prompt_tokens": 966,
+          "total_tokens": 1009,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 768
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 198
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.203
+      },
+      {
+        "type": "tool",
+        "name": "read_webpage",
+        "arguments": {
+          "url": "https://example.com/"
+        },
+        "elapsed_seconds": 0.815,
+        "result": {
+          "url": "https://example.com/",
+          "title": "Example Domain",
+          "content": "This domain is for use in documentation examples without needing permission. This is not a service; avoid relying on it for testing and monitoring purposes.",
+          "truncated": false
+        }
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 2,
+        "usage": {
+          "completion_tokens": 64,
+          "prompt_tokens": 1076,
+          "total_tokens": 1140,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 896
+          },
+          "prompt_cache_hit_tokens": 896,
+          "prompt_cache_miss_tokens": 180
+        },
+        "finish_reason": "stop",
+        "elapsed_seconds": 1.316
+      }
+    ],
+    "logs": "[模型请求 1/5]\n[工具] read_webpage 参数：{\"url\": \"https://example.com/\"}\n[工具结果] {\"url\": \"https://example.com/\", \"title\": \"Example Domain\", \"content\": \"This domain is for use in documentation examples without needing permission. This is not a service; avoid relying on it for testing and monitoring purposes.\", \"truncated\": false}\n[模型请求 2/5]\n"
+  },
+  {
+    "case": "图片理解",
+    "prompt": "请阅读 images/demo-chart.png，告诉我 2024 和 2025 年对应的两个数值。",
+    "answer": "根据图片 (`images/demo-chart.png`)：\n\n- **2024 年：120**\n- **2025 年：150**\n\n图表标题标注为 \"DEMO DATA (units)\"，即单位为 units。\n\n两点说明：\n1. 以上是图像识别工具读取的结果，建议你对照原图核对一下，尤其是坐标轴刻度的具体位置。\n2. 该图标注为 \"DEMO DATA\"（演示数据），并非真实统计数字，因此这两个值不宜当作实际数据引用。\n\n如果你需要，我可以帮你算一下年度增长率。",
+    "error": null,
+    "model_requests": 3,
+    "tool_calls": 1,
+    "total_tokens": 2917,
+    "tool_errors": [],
+    "output_truncated": false,
+    "events": [
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 1,
+        "usage": {
+          "completion_tokens": 86,
+          "prompt_tokens": 967,
+          "total_tokens": 1053,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 768
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 199
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.346
+      },
+      {
+        "type": "tool",
+        "name": "analyze_image",
+        "arguments": {
+          "image_source": "images/demo-chart.png",
+          "question": "图中 2024 年和 2025 年对应的数值分别是多少？请给出具体数字。"
+        },
+        "elapsed_seconds": 2.679,
+        "result": {
+          "image_source": "images/demo-chart.png",
+          "analysis": "直接观察图片文字：\n\n- 2024 年对应数值：**120**\n- 2025 年对应数值：**150**\n\n图中标题为 “DEMO DATA (units)”，因此单位按图片为 **units**。以上均为直接观察，无推测。"
+        }
+      },
+      {
+        "type": "model",
+        "kind": "vision",
+        "request": 2,
+        "usage": {
+          "input_tokens": 318,
+          "input_tokens_details": {
+            "cached_tokens": 0
+          },
+          "output_tokens": 285,
+          "output_tokens_details": {
+            "reasoning_tokens": 227
+          },
+          "total_tokens": 603
+        },
+        "status": "completed",
+        "elapsed_seconds": 2.652
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 3,
+        "usage": {
+          "completion_tokens": 115,
+          "prompt_tokens": 1146,
+          "total_tokens": 1261,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 896
+          },
+          "prompt_cache_hit_tokens": 896,
+          "prompt_cache_miss_tokens": 250
+        },
+        "finish_reason": "stop",
+        "elapsed_seconds": 1.68
+      }
+    ],
+    "logs": "[模型请求 1/5]\n[工具] analyze_image 参数：{\"image_source\": \"images/demo-chart.png\", \"question\": \"图中 2024 年和 2025 年对应的数值分别是多少？请给出具体数字。\"}\n[工具结果] {\"image_source\": \"images/demo-chart.png\", \"analysis\": \"直接观察图片文字：\\n\\n- 2024 年对应数值：**120**\\n- 2025 年对应数值：**150**\\n\\n图中标题为 “DEMO DATA (units)”，因此单位按图片为 **units**。以上均为直接观察，无推测。\"}\n[模型请求 2/5]\n"
+  },
+  {
+    "case": "看图后计算",
+    "prompt": "阅读 images/demo-chart.png，提取 2024 和 2025 年的数值，然后使用计算工具算出增长百分比。简短给出数据和结果。",
+    "answer": "**数据（来自 images/demo-chart.png，标题 \"DEMO DATA\"，单位为 charts 上的无标注数值）**\n\n- 2024 年：120\n- 2025 年：150\n\n**计算**：差值 150 − 120 = 30；30 ÷ 120 = 0.25\n\n**增长百分比：+25%**\n\n（说明：首次读图因视觉模型输出上限失败，重试后得到上述数值；图内单位标注不明确，仅按数值计算。）",
+    "error": null,
+    "model_requests": 7,
+    "tool_calls": 4,
+    "total_tokens": 8239,
+    "tool_errors": [
+      {
+        "type": "tool",
+        "name": "analyze_image",
+        "arguments": {
+          "image_source": "images/demo-chart.png",
+          "question": "请提取图表中 2024 年和 2025 年的数值（标明单位），以及图表标题和纵轴单位。"
+        },
+        "elapsed_seconds": 5.039,
+        "result": {
+          "error": {
+            "code": "vision_incomplete",
+            "message": "视觉模型未完成分析，可能达到输出上限"
+          }
+        }
+      }
+    ],
+    "output_truncated": true,
+    "events": [
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 1,
+        "usage": {
+          "completion_tokens": 92,
+          "prompt_tokens": 977,
+          "total_tokens": 1069,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 768
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 209
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.431
+      },
+      {
+        "type": "tool",
+        "name": "analyze_image",
+        "arguments": {
+          "image_source": "images/demo-chart.png",
+          "question": "请提取图表中 2024 年和 2025 年的数值（标明单位），以及图表标题和纵轴单位。"
+        },
+        "elapsed_seconds": 5.039,
+        "result": {
+          "error": {
+            "code": "vision_incomplete",
+            "message": "视觉模型未完成分析，可能达到输出上限"
+          }
+        }
+      },
+      {
+        "type": "model",
+        "kind": "vision",
+        "request": 2,
+        "usage": {
+          "input_tokens": 324,
+          "input_tokens_details": {
+            "cached_tokens": 0
+          },
+          "output_tokens": 768,
+          "output_tokens_details": {
+            "reasoning_tokens": 718
+          },
+          "total_tokens": 1092
+        },
+        "status": "incomplete",
+        "elapsed_seconds": 5.038
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 3,
+        "usage": {
+          "completion_tokens": 89,
+          "prompt_tokens": 1107,
+          "total_tokens": 1196,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 896
+          },
+          "prompt_cache_hit_tokens": 896,
+          "prompt_cache_miss_tokens": 211
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.222
+      },
+      {
+        "type": "tool",
+        "name": "analyze_image",
+        "arguments": {
+          "image_source": "images/demo-chart.png",
+          "question": "只回答：图表标题、2024 年数值、2025 年数值。请简短列出。"
+        },
+        "elapsed_seconds": 2.1,
+        "result": {
+          "image_source": "images/demo-chart.png",
+          "analysis": "- 图表标题：DEMO DATA (units)  \n- 2024 年数值：120  \n- 2025 年数值：150"
+        }
+      },
+      {
+        "type": "model",
+        "kind": "vision",
+        "request": 4,
+        "usage": {
+          "input_tokens": 319,
+          "input_tokens_details": {
+            "cached_tokens": 0
+          },
+          "output_tokens": 210,
+          "output_tokens_details": {
+            "reasoning_tokens": 178
+          },
+          "total_tokens": 529
+        },
+        "status": "completed",
+        "elapsed_seconds": 2.099
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 5,
+        "usage": {
+          "completion_tokens": 69,
+          "prompt_tokens": 1259,
+          "total_tokens": 1328,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 1024
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 235
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.241
+      },
+      {
+        "type": "tool",
+        "name": "calculate",
+        "arguments": {
+          "operation": "subtract",
+          "a": 150.0,
+          "b": 120.0
+        },
+        "elapsed_seconds": 0.0,
+        "result": {
+          "operation": "subtract",
+          "a": 150.0,
+          "b": 120.0,
+          "result": 30.0
+        }
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 6,
+        "usage": {
+          "completion_tokens": 68,
+          "prompt_tokens": 1370,
+          "total_tokens": 1438,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 1152
+          },
+          "prompt_cache_hit_tokens": 1152,
+          "prompt_cache_miss_tokens": 218
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.138
+      },
+      {
+        "type": "tool",
+        "name": "calculate",
+        "arguments": {
+          "operation": "divide",
+          "a": 30.0,
+          "b": 120.0
+        },
+        "elapsed_seconds": 0.0,
+        "result": {
+          "operation": "divide",
+          "a": 30.0,
+          "b": 120.0,
+          "result": 0.25
+        }
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 7,
+        "usage": {
+          "completion_tokens": 108,
+          "prompt_tokens": 1479,
+          "total_tokens": 1587,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 1280
+          },
+          "prompt_cache_hit_tokens": 1280,
+          "prompt_cache_miss_tokens": 199
+        },
+        "finish_reason": "stop",
+        "elapsed_seconds": 1.527
+      }
+    ],
+    "logs": "[模型请求 1/5]\n[工具] analyze_image 参数：{\"image_source\": \"images/demo-chart.png\", \"question\": \"请提取图表中 2024 年和 2025 年的数值（标明单位），以及图表标题和纵轴单位。\"}\n[工具结果] {\"error\": {\"code\": \"vision_incomplete\", \"message\": \"视觉模型未完成分析，可能达到输出上限\"}}\n[模型请求 2/5]\n[工具] analyze_image 参数：{\"image_source\": \"images/demo-chart.png\", \"question\": \"只回答：图表标题、2024 年数值、2025 年数值。请简短列出。\"}\n[工具结果] {\"image_source\": \"images/demo-chart.png\", \"analysis\": \"- 图表标题：DEMO DATA (units)  \\n- 2024 年数值：120  \\n- 2025 年数值：150\"}\n[模型请求 3/5]\n[工具] calculate 参数：{\"operation\": \"subtract\", \"a\": 150, \"b\": 120}\n[工具结果] {\"operation\": \"subtract\", \"a\": 150.0, \"b\": 120.0, \"result\": 30.0}\n[模型请求 4/5]\n[工具] calculate 参数：{\"operation\": \"divide\", \"a\": 30, \"b\": 120}\n[工具结果] {\"operation\": \"divide\", \"a\": 30.0, \"b\": 120.0, \"result\": 0.25}\n[模型请求 5/5]\n"
+  },
+  {
+    "case": "工具错误",
+    "prompt": "请用 calculate 计算 10 除以 0。如果工具返回错误，就说明原因并停止，不要编造数值。",
+    "answer": "工具返回错误：`division_by_zero` —— 除数不能为零。\n\n原因：10 ÷ 0 在数学上没有定义（任何数乘以 0 都得 0，无法得到 10），因此没有可返回的数值。按你的要求，到此停止，不编造结果。",
+    "error": null,
+    "model_requests": 2,
+    "tool_calls": 1,
+    "total_tokens": 2170,
+    "tool_errors": [
+      {
+        "type": "tool",
+        "name": "calculate",
+        "arguments": {
+          "operation": "divide",
+          "a": 10.0,
+          "b": 0.0
+        },
+        "elapsed_seconds": 0.0,
+        "result": {
+          "error": {
+            "code": "division_by_zero",
+            "message": "除数不能为零"
+          }
+        }
+      }
+    ],
+    "output_truncated": false,
+    "events": [
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 1,
+        "usage": {
+          "completion_tokens": 68,
+          "prompt_tokens": 971,
+          "total_tokens": 1039,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 768
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 203
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.448
+      },
+      {
+        "type": "tool",
+        "name": "calculate",
+        "arguments": {
+          "operation": "divide",
+          "a": 10.0,
+          "b": 0.0
+        },
+        "elapsed_seconds": 0.0,
+        "result": {
+          "error": {
+            "code": "division_by_zero",
+            "message": "除数不能为零"
+          }
+        }
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 2,
+        "usage": {
+          "completion_tokens": 61,
+          "prompt_tokens": 1070,
+          "total_tokens": 1131,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 896
+          },
+          "prompt_cache_hit_tokens": 896,
+          "prompt_cache_miss_tokens": 174
+        },
+        "finish_reason": "stop",
+        "elapsed_seconds": 1.213
+      }
+    ],
+    "logs": "[模型请求 1/5]\n[工具] calculate 参数：{\"operation\": \"divide\", \"a\": 10, \"b\": 0}\n[工具结果] {\"error\": {\"code\": \"division_by_zero\", \"message\": \"除数不能为零\"}}\n[模型请求 2/5]\n"
+  }
+]

@@ -1,0 +1,358 @@
+[
+  {
+    "case": "网页搜索",
+    "prompt": "用 web_search 搜索 Hugging Face Agents Course 官方课程，最多返回两条搜索结果，给出官方入口 URL。",
+    "answer": "两次调用 web_search 都返回 `DDGSException` 执行失败，未能获得任何搜索结果，因此我无法从工具结果中给出可核实的官方入口 URL（按规则不能凭记忆补链接）。\n\n已知（非工具来源、仅供参考、未核实）该课程通常位于 `https://huggingface.co/learn/agents-course`，但请你自行打开确认，或稍后让我重试搜索。",
+    "error": null,
+    "model_requests": 3,
+    "tool_calls": 2,
+    "total_tokens": 3301,
+    "tool_errors": [
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "Hugging Face Agents Course official",
+          "max_results": 2
+        },
+        "elapsed_seconds": 1.63,
+        "result": {
+          "error": {
+            "code": "execution_error",
+            "message": "工具执行失败",
+            "type": "DDGSException"
+          }
+        }
+      },
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "Hugging Face Agents Course",
+          "max_results": 2
+        },
+        "elapsed_seconds": 1.281,
+        "result": {
+          "error": {
+            "code": "execution_error",
+            "message": "工具执行失败",
+            "type": "DDGSException"
+          }
+        }
+      }
+    ],
+    "output_truncated": false,
+    "events": [
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 1,
+        "usage": {
+          "completion_tokens": 60,
+          "prompt_tokens": 922,
+          "total_tokens": 982,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 922
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.888
+      },
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "Hugging Face Agents Course official",
+          "max_results": 2
+        },
+        "elapsed_seconds": 1.63,
+        "result": {
+          "error": {
+            "code": "execution_error",
+            "message": "工具执行失败",
+            "type": "DDGSException"
+          }
+        }
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 2,
+        "usage": {
+          "completion_tokens": 75,
+          "prompt_tokens": 1021,
+          "total_tokens": 1096,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 768
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 253
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.462
+      },
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "Hugging Face Agents Course",
+          "max_results": 2
+        },
+        "elapsed_seconds": 1.281,
+        "result": {
+          "error": {
+            "code": "execution_error",
+            "message": "工具执行失败",
+            "type": "DDGSException"
+          }
+        }
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 3,
+        "usage": {
+          "completion_tokens": 88,
+          "prompt_tokens": 1135,
+          "total_tokens": 1223,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 896
+          },
+          "prompt_cache_hit_tokens": 896,
+          "prompt_cache_miss_tokens": 239
+        },
+        "finish_reason": "stop",
+        "elapsed_seconds": 1.503
+      }
+    ],
+    "logs": "[模型请求 1/5]\n[工具] web_search 参数：{\"query\": \"Hugging Face Agents Course official\", \"max_results\": 2}\n[工具结果] {\"error\": {\"code\": \"execution_error\", \"message\": \"工具执行失败\", \"type\": \"DDGSException\"}}\n[模型请求 2/5]\n[工具] web_search 参数：{\"query\": \"Hugging Face Agents Course\", \"max_results\": 2}\n[工具结果] {\"error\": {\"code\": \"execution_error\", \"message\": \"工具执行失败\", \"type\": \"DDGSException\"}}\n[模型请求 3/5]\n"
+  },
+  {
+    "case": "搜索后读取",
+    "prompt": "先用 web_search 搜索 Hugging Face Agents Course 官方 GitHub 仓库，再用 read_webpage 读取搜索返回的仓库 URL，用两句话说明课程内容并附来源 URL。",
+    "answer": "搜索工具连续三次失败（DDGSException），无法取得搜索返回的链接；我改为直接读取官方仓库地址并成功获取内容。\n\n课程分为 4 个单元（含奖励单元），从智能体的基础概念讲起，涵盖 LLM、函数调用的微调、smolagents / LlamaIndex / LangGraph 等框架，延伸到 Agentic RAG 用例，最后通过期末项目（自动评测与排行榜）构建、测试并认证自己的 agent；学习前提是具备 Python 与 LLM 基础知识，课程免费并提供结业认证。\n\n来源：https://github.com/huggingface/agents-course\n\n（说明：该 URL 来自我直接尝试的官方地址，而非搜索工具返回结果——搜索环节因工具报错未能完成。）",
+    "error": null,
+    "model_requests": 5,
+    "tool_calls": 4,
+    "total_tokens": 6917,
+    "tool_errors": [
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "Hugging Face Agents Course official GitHub repository",
+          "max_results": 3
+        },
+        "elapsed_seconds": 1.264,
+        "result": {
+          "error": {
+            "code": "execution_error",
+            "message": "工具执行失败",
+            "type": "DDGSException"
+          }
+        }
+      },
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "huggingface agents-course github",
+          "max_results": 3
+        },
+        "elapsed_seconds": 1.266,
+        "result": {
+          "error": {
+            "code": "execution_error",
+            "message": "工具执行失败",
+            "type": "DDGSException"
+          }
+        }
+      },
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "Hugging Face Agents Course",
+          "max_results": 3
+        },
+        "elapsed_seconds": 1.281,
+        "result": {
+          "error": {
+            "code": "execution_error",
+            "message": "工具执行失败",
+            "type": "DDGSException"
+          }
+        }
+      }
+    ],
+    "output_truncated": false,
+    "events": [
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 1,
+        "usage": {
+          "completion_tokens": 69,
+          "prompt_tokens": 938,
+          "total_tokens": 1007,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 768
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 170
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.082
+      },
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "Hugging Face Agents Course official GitHub repository",
+          "max_results": 3
+        },
+        "elapsed_seconds": 1.264,
+        "result": {
+          "error": {
+            "code": "execution_error",
+            "message": "工具执行失败",
+            "type": "DDGSException"
+          }
+        }
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 2,
+        "usage": {
+          "completion_tokens": 73,
+          "prompt_tokens": 1046,
+          "total_tokens": 1119,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 896
+          },
+          "prompt_cache_hit_tokens": 896,
+          "prompt_cache_miss_tokens": 150
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.377
+      },
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "huggingface agents-course github",
+          "max_results": 3
+        },
+        "elapsed_seconds": 1.266,
+        "result": {
+          "error": {
+            "code": "execution_error",
+            "message": "工具执行失败",
+            "type": "DDGSException"
+          }
+        }
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 3,
+        "usage": {
+          "completion_tokens": 59,
+          "prompt_tokens": 1158,
+          "total_tokens": 1217,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 1024
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 134
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.246
+      },
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "Hugging Face Agents Course",
+          "max_results": 3
+        },
+        "elapsed_seconds": 1.281,
+        "result": {
+          "error": {
+            "code": "execution_error",
+            "message": "工具执行失败",
+            "type": "DDGSException"
+          }
+        }
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 4,
+        "usage": {
+          "completion_tokens": 89,
+          "prompt_tokens": 1256,
+          "total_tokens": 1345,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 1024
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 232
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.566
+      },
+      {
+        "type": "tool",
+        "name": "read_webpage",
+        "arguments": {
+          "url": "https://github.com/huggingface/agents-course"
+        },
+        "elapsed_seconds": 1.68,
+        "result": {
+          "url": "https://github.com/huggingface/agents-course",
+          "title": "GitHub - huggingface/agents-course: This repository contains the Hugging Face Agents Course. · GitHub",
+          "content": "If you like the course, don't hesitate to ⭐ star this repository. This helps us to make the course more visible 🤗.\nThe course is divided into 4 units. These will take you from the basics of agents to a final assignment with a benchmark.\nSign up here (it's free) 👉 https://bit.ly/hf-learn-agents\nYou can access the course here 👉 https://hf.co/learn/agents-course\n| Unit | Topic | Description | \n|---|---|---|\n| 0 | Welcome to the Course | Welcome, guidelines, necessary tools, and course overview. | \n| 1 | Introduction to Agents | Definition of agents, LLMs, model family tree, and special tokens. | \n| 1 Bonus | Fine-tuning an LLM for Function-calling | Learn how to fine-tune an LLM for Function-Calling | \n| 2 | Frameworks for AI Agents | Overview of smolagents, LangGraph and LlamaIndex. | \n| 2.1 | The Smolagents Framework | Learn how to build effective agents using the smolagents library, a lightweight framework for creating capable AI agents. | \n| 2.2 | The LlamaIndex Framework | Learn how to build LLM-powered agents over your data using indexes and workflows using the LlamaIndex toolkit. | \n| 2.3 | The LangGraph Framework | Learn how to build production-ready applications using the LangGraph framework giving you control tools over the flow of your agent. | \n| 2 Bonus | Observability and Evaluation | Learn how to trace and evaluate your agents. | \n| 3 | Use Case for Agentic RAG | Learn how to use Agentic RAG to help agents respond to different use cases using various frameworks. | \n| 4 | Final Project - Create, Test and Certify Your Agent | Automated evaluation of agents and leaderboard with student results. | \n| 3 Bonus | Agents in Games with Pokemon | Explore the exciting intersection of AI Agents and games. | \n- Basic knowledge of Python\n- Basic knowledge of LLMs\nIf you want to contribute to this course, you're welcome to do so. Feel free to open an issue or join the discussion in the Discord. For specific contributions, here are some guidelines:\nIf you find a small typo or grammar mistake, please fix it yourself and submit a pull request. This is very helpful for students.\nIf you want to add a new unit, please create an issue in the repository, describe the unit, and why it should be added. We will discuss it and if it's a good addition, we can collaborate on it.\nTo cite this repository in publications:\n@misc{agents-course,\n  author = {Burtenshaw, Ben and Thomas, Joffrey and Simonini, Thomas and Paniego, Sergio},\n  title = {The Hugging Face Agents Course},\n  year = {2025},\n  howpublished = {\\url{https://github.com/huggingface/agents-course}},\n  note = {GitHub repository},\n}",
+          "truncated": false
+        }
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 5,
+        "usage": {
+          "completion_tokens": 161,
+          "prompt_tokens": 2068,
+          "total_tokens": 2229,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 1280
+          },
+          "prompt_cache_hit_tokens": 1280,
+          "prompt_cache_miss_tokens": 788
+        },
+        "finish_reason": "stop",
+        "elapsed_seconds": 1.909
+      }
+    ],
+    "logs": "[模型请求 1/5]\n[工具] web_search 参数：{\"query\": \"Hugging Face Agents Course official GitHub repository\", \"max_results\": 3}\n[工具结果] {\"error\": {\"code\": \"execution_error\", \"message\": \"工具执行失败\", \"type\": \"DDGSException\"}}\n[模型请求 2/5]\n[工具] web_search 参数：{\"query\": \"huggingface agents-course github\", \"max_results\": 3}\n[工具结果] {\"error\": {\"code\": \"execution_error\", \"message\": \"工具执行失败\", \"type\": \"DDGSException\"}}\n[模型请求 3/5]\n[工具] web_search 参数：{\"query\": \"Hugging Face Agents Course\", \"max_results\": 3}\n[工具结果] {\"error\": {\"code\": \"execution_error\", \"message\": \"工具执行失败\", \"type\": \"DDGSException\"}}\n[模型请求 4/5]\n[工具] read_webpage 参数：{\"url\": \"https://github.com/huggingface/agents-course\"}\n[工具结果] {\"url\": \"https://github.com/huggingface/agents-course\", \"title\": \"GitHub - huggingface/agents-course: This repository contains the Hugging Face Agents Course. · GitHub\", \"content\": \"If you like the course, don't hesitate to ⭐ star this repository. This helps us to make the course more visible 🤗.\\nThe course is divided into 4 units. These will take you from the basics of agents to a final assignmen\n[模型请求 5/5]\n"
+  }
+]

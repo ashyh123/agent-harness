@@ -1,0 +1,6 @@
+openai==2.26.0
+pydantic==2.12.5
+ddgs==9.16.0
+httpx==0.28.1
+trafilatura==2.3.0
+pillow==12.3.0

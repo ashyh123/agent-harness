@@ -1,0 +1,127 @@
+[
+  {
+    "case": "搜索后读取",
+    "prompt": "先用 web_search 搜索 Hugging Face Agents Course 官方 GitHub 仓库，再用 read_webpage 读取搜索返回的仓库 URL，用两句话说明课程内容并附来源 URL。",
+    "answer": "搜索到的官方仓库是 https://github.com/huggingface/agents-course。\n\n该课程分为 4 个单元，从 Agent 基础概念讲起（单元 1 介绍 Agent 与 LLM 定义），再到 AI Agent 框架（单元 2 涵盖 smolagents、LlamaIndex、LangGraph），最后进入 Agentic RAG 用例（单元 3）和带自动化评测与排行榜的最终项目（单元 4），此外还有函数调用微调、可观测性与评估、游戏中的 Agent 等加分单元。学习该课程需要 Python 和 LLM 的基础知识。\n\n来源：https://github.com/huggingface/agents-course",
+    "error": null,
+    "model_requests": 3,
+    "tool_calls": 2,
+    "total_tokens": 5197,
+    "tool_errors": [],
+    "output_truncated": false,
+    "events": [
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 1,
+        "usage": {
+          "completion_tokens": 62,
+          "prompt_tokens": 1028,
+          "total_tokens": 1090,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 768
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 260
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 2.335
+      },
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "Hugging Face Agents Course official GitHub repository",
+          "max_results": 5
+        },
+        "elapsed_seconds": 2.05,
+        "result": {
+          "provider": "duckduckgo",
+          "results": [
+            {
+              "title": "The Hugging Face Agents Course - GitHub",
+              "url": "https://github.com/huggingface/agents-course",
+              "snippet": "The Hugging Face Agents Course If you like the course, don't hesitate to ⭐ star this repository. This helps us to make the course more visible 🤗."
+            },
+            {
+              "title": "agents-course/units/en/unit0/introduction.mdx at main - GitHub",
+              "url": "https://github.com/huggingface/agents-course/blob/main/units/en/unit0/introduction.mdx",
+              "snippet": "The course is composed of: Foundational Units: where you learn Agents concepts in theory. Hands-on: where you'll learn to use established AI Agent libraries to train your agents in unique environments. These hands-on sections will be Hugging Face Spaces with a pre-configured environment. Use case assignments: where you'll apply the concepts you've learned to solve a real-world problem that you ..."
+            },
+            {
+              "title": "Hugging Face Agents Course",
+              "url": "https://huggingface.co/agents-course",
+              "snippet": "Org profile for Hugging Face Agents Course on Hugging Face, the AI community building the future."
+            },
+            {
+              "title": "GitHub - huggingface/agents-course: This repository contains the ...",
+              "url": "https://download.plaud.ai/huggingface/agents-course",
+              "snippet": "If you like the course, don't hesitate to ⭐ star this repository. This helps us to make the course more visible 🤗."
+            },
+            {
+              "title": "Hugging Face Agents Course review: units, frameworks and certification ...",
+              "url": "https://hysenlabs.com/en/projects/huggingface-agents-course",
+              "snippet": "The repository is the source of an open course that runs from agent fundamentals through smolagents, LlamaIndex and LangGraph to a benchmarked final project. It is a teaching curriculum, not a library, and its value depends on whether you want a guided path or a reference. Contents What the Agents Course repository actually contains How the curriculum is sequenced from definitions to a ..."
+            }
+          ],
+          "message": "找到搜索结果"
+        }
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 2,
+        "usage": {
+          "completion_tokens": 49,
+          "prompt_tokens": 1572,
+          "total_tokens": 1621,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 1024
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 548
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.148
+      },
+      {
+        "type": "tool",
+        "name": "read_webpage",
+        "arguments": {
+          "url": "https://github.com/huggingface/agents-course"
+        },
+        "elapsed_seconds": 1.666,
+        "result": {
+          "url": "https://github.com/huggingface/agents-course",
+          "title": "GitHub - huggingface/agents-course: This repository contains the Hugging Face Agents Course. · GitHub",
+          "content": "If you like the course, don't hesitate to ⭐ star this repository. This helps us to make the course more visible 🤗.\nThe course is divided into 4 units. These will take you from the basics of agents to a final assignment with a benchmark.\nSign up here (it's free) 👉 https://bit.ly/hf-learn-agents\nYou can access the course here 👉 https://hf.co/learn/agents-course\n| Unit | Topic | Description | \n|---|---|---|\n| 0 | Welcome to the Course | Welcome, guidelines, necessary tools, and course overview. | \n| 1 | Introduction to Agents | Definition of agents, LLMs, model family tree, and special tokens. | \n| 1 Bonus | Fine-tuning an LLM for Function-calling | Learn how to fine-tune an LLM for Function-Calling | \n| 2 | Frameworks for AI Agents | Overview of smolagents, LangGraph and LlamaIndex. | \n| 2.1 | The Smolagents Framework | Learn how to build effective agents using the smolagents library, a lightweight framework for creating capable AI agents. | \n| 2.2 | The LlamaIndex Framework | Learn how to build LLM-powered agents over your data using indexes and workflows using the LlamaIndex toolkit. | \n| 2.3 | The LangGraph Framework | Learn how to build production-ready applications using the LangGraph framework giving you control tools over the flow of your agent. | \n| 2 Bonus | Observability and Evaluation | Learn how to trace and evaluate your agents. | \n| 3 | Use Case for Agentic RAG | Learn how to use Agentic RAG to help agents respond to different use cases using various frameworks. | \n| 4 | Final Project - Create, Test and Certify Your Agent | Automated evaluation of agents and leaderboard with student results. | \n| 3 Bonus | Agents in Games with Pokemon | Explore the exciting intersection of AI Agents and games. | \n- Basic knowledge of Python\n- Basic knowledge of LLMs\nIf you want to contribute to this course, you're welcome to do so. Feel free to open an issue or join the discussion in the Discord. For specific contributions, here are some guidelines:\nIf you find a small typo or grammar mistake, please fix it yourself and submit a pull request. This is very helpful for students.\nIf you want to add a new unit, please create an issue in the repository, describe the unit, and why it should be added. We will discuss it and if it's a good addition, we can collaborate on it.\nTo cite this repository in publications:\n@misc{agents-course,\n  author = {Burtenshaw, Ben and Thomas, Joffrey and Simonini, Thomas and Paniego, Sergio},\n  title = {The Hugging Face Agents Course},\n  year = {2025},\n  howpublished = {\\url{https://github.com/huggingface/agents-course}},\n  note = {GitHub repository},\n}",
+          "truncated": false
+        }
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 3,
+        "usage": {
+          "completion_tokens": 142,
+          "prompt_tokens": 2344,
+          "total_tokens": 2486,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 1536
+          },
+          "prompt_cache_hit_tokens": 1536,
+          "prompt_cache_miss_tokens": 808
+        },
+        "finish_reason": "stop",
+        "elapsed_seconds": 1.612
+      }
+    ],
+    "logs": "[模型请求 1/5]\n[工具] web_search 参数：{\"query\": \"Hugging Face Agents Course official GitHub repository\", \"max_results\": 5}\n[工具结果] {\"provider\": \"duckduckgo\", \"results\": [{\"title\": \"The Hugging Face Agents Course - GitHub\", \"url\": \"https://github.com/huggingface/agents-course\", \"snippet\": \"The Hugging Face Agents Course If you like the course, don't hesitate to ⭐ star this repository. This helps us to make the course more visible 🤗.\"}, {\"title\": \"agents-course/units/en/unit0/introduction.mdx at main - GitHub\", \"url\": \"https://\n[模型请求 2/5]\n[工具] read_webpage 参数：{\"url\": \"https://github.com/huggingface/agents-course\"}\n[工具结果] {\"url\": \"https://github.com/huggingface/agents-course\", \"title\": \"GitHub - huggingface/agents-course: This repository contains the Hugging Face Agents Course. · GitHub\", \"content\": \"If you like the course, don't hesitate to ⭐ star this repository. This helps us to make the course more visible 🤗.\\nThe course is divided into 4 units. These will take you from the basics of agents to a final assignmen\n[模型请求 3/5]\n"
+  }
+]

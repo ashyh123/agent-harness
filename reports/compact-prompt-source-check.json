@@ -1,0 +1,246 @@
+[
+  {
+    "case": "搜索无结果",
+    "prompt": "请搜索 Hugging Face Agents Course 官方课程入口，并给出官方 URL。",
+    "answer": "两次搜索都返回了空结果（DuckDuckGo 未返回任何条目），所以我暂时无法提供经工具核实的官方 URL。\n\n不过根据我已有的记忆（**未通过本次工具核实**）：\n\n- Hugging Face 的免费 Agents Course 通常位于 `https://huggingface.co/learn/agents-course/unit0/introduction`（课程入口页），Hugging Face Learn 平台首页为 `https://huggingface.co/learn`。\n\n建议你直接访问 `https://huggingface.co/learn`，在课程列表中找到 \"Agents Course\" 点击进入，这是最可靠的确认方式。如果你希望我再试一次搜索（例如换关键词或稍后重试），请告诉我。",
+    "error": null,
+    "model_requests": 2,
+    "tool_calls": 2,
+    "total_tokens": 1425,
+    "tool_errors": [],
+    "output_truncated": false,
+    "events": [
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 1,
+        "usage": {
+          "completion_tokens": 126,
+          "prompt_tokens": 485,
+          "total_tokens": 611,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 485
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 2.013
+      },
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "Hugging Face Agents Course official",
+          "max_results": 5
+        },
+        "result": {
+          "provider": "duckduckgo",
+          "results": []
+        },
+        "elapsed_seconds": 0
+      },
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "huggingface.co/learn agents course",
+          "max_results": 5
+        },
+        "result": {
+          "provider": "duckduckgo",
+          "results": []
+        },
+        "elapsed_seconds": 0
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 2,
+        "usage": {
+          "completion_tokens": 155,
+          "prompt_tokens": 659,
+          "total_tokens": 814,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 512
+          },
+          "prompt_cache_hit_tokens": 512,
+          "prompt_cache_miss_tokens": 147
+        },
+        "finish_reason": "stop",
+        "elapsed_seconds": 1.493
+      }
+    ],
+    "logs": "[模型请求 1/5]\n[工具] web_search 参数：{\"query\": \"Hugging Face Agents Course official\", \"max_results\": 5}\n[工具结果] {\"provider\": \"duckduckgo\", \"results\": []}\n[工具] web_search 参数：{\"query\": \"huggingface.co/learn agents course\", \"max_results\": 5}\n[工具结果] {\"provider\": \"duckduckgo\", \"results\": []}\n[模型请求 2/5]\n",
+    "tool_response_mode": "simulated",
+    "has_unreturned_url": true
+  },
+  {
+    "case": "搜索服务失败",
+    "prompt": "请搜索 Hugging Face Agents Course 官方课程入口，并给出官方 URL。",
+    "answer": "搜索工具连续失败，无法核实。\n\n**无法提供官方 URL**：我调用了网页搜索工具（含「Hugging Face Agents Course」等查询），三次均返回 `DDGSException` 执行错误，未取得任何搜索结果。按规则我不能凭记忆补链接，因此这里不给出 URL。\n\n建议你自行核对：在浏览器访问 Hugging Face 官网（huggingface.co），进入 \"Learn\" 板块查找 Agents Course 入口，或直接用站内搜索 \"Agents Course\"。如需我再试一次搜索工具，告诉我即可。",
+    "error": null,
+    "model_requests": 3,
+    "tool_calls": 3,
+    "total_tokens": 2095,
+    "tool_errors": [
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "Hugging Face Agents Course official"
+        },
+        "result": {
+          "error": {
+            "code": "execution_error",
+            "message": "工具执行失败",
+            "type": "DDGSException"
+          }
+        },
+        "elapsed_seconds": 0
+      },
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "huggingface.co learn agents course"
+        },
+        "result": {
+          "error": {
+            "code": "execution_error",
+            "message": "工具执行失败",
+            "type": "DDGSException"
+          }
+        },
+        "elapsed_seconds": 0
+      },
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "Hugging Face Agents Course"
+        },
+        "result": {
+          "error": {
+            "code": "execution_error",
+            "message": "工具执行失败",
+            "type": "DDGSException"
+          }
+        },
+        "elapsed_seconds": 0
+      }
+    ],
+    "output_truncated": false,
+    "events": [
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 1,
+        "usage": {
+          "completion_tokens": 78,
+          "prompt_tokens": 485,
+          "total_tokens": 563,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 256
+          },
+          "prompt_cache_hit_tokens": 256,
+          "prompt_cache_miss_tokens": 229
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.038
+      },
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "Hugging Face Agents Course official"
+        },
+        "result": {
+          "error": {
+            "code": "execution_error",
+            "message": "工具执行失败",
+            "type": "DDGSException"
+          }
+        },
+        "elapsed_seconds": 0
+      },
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "huggingface.co learn agents course"
+        },
+        "result": {
+          "error": {
+            "code": "execution_error",
+            "message": "工具执行失败",
+            "type": "DDGSException"
+          }
+        },
+        "elapsed_seconds": 0
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 2,
+        "usage": {
+          "completion_tokens": 51,
+          "prompt_tokens": 637,
+          "total_tokens": 688,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 384
+          },
+          "prompt_cache_hit_tokens": 384,
+          "prompt_cache_miss_tokens": 253
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.039
+      },
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "Hugging Face Agents Course"
+        },
+        "result": {
+          "error": {
+            "code": "execution_error",
+            "message": "工具执行失败",
+            "type": "DDGSException"
+          }
+        },
+        "elapsed_seconds": 0
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 3,
+        "usage": {
+          "completion_tokens": 117,
+          "prompt_tokens": 727,
+          "total_tokens": 844,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 512
+          },
+          "prompt_cache_hit_tokens": 512,
+          "prompt_cache_miss_tokens": 215
+        },
+        "finish_reason": "stop",
+        "elapsed_seconds": 1.548
+      }
+    ],
+    "logs": "[模型请求 1/5]\n[工具] web_search 参数：{\"query\": \"Hugging Face Agents Course official\"}\n[工具结果] {\"error\": {\"code\": \"execution_error\", \"message\": \"工具执行失败\", \"type\": \"DDGSException\"}}\n[工具] web_search 参数：{\"query\": \"huggingface.co learn agents course\"}\n[工具结果] {\"error\": {\"code\": \"execution_error\", \"message\": \"工具执行失败\", \"type\": \"DDGSException\"}}\n[模型请求 2/5]\n[工具] web_search 参数：{\"query\": \"Hugging Face Agents Course\"}\n[工具结果] {\"error\": {\"code\": \"execution_error\", \"message\": \"工具执行失败\", \"type\": \"DDGSException\"}}\n[模型请求 3/5]\n",
+    "tool_response_mode": "simulated",
+    "has_unreturned_url": false
+  }
+]

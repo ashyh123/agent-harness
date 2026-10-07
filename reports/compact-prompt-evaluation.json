@@ -1,0 +1,768 @@
+[
+  {
+    "case": "普通问候",
+    "prompt": "你好，请简短回复。",
+    "answer": "你好！有什么可以帮你的吗？",
+    "error": null,
+    "model_requests": 1,
+    "tool_calls": 0,
+    "total_tokens": 887,
+    "tool_errors": [],
+    "output_truncated": false,
+    "events": [
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 1,
+        "usage": {
+          "completion_tokens": 8,
+          "prompt_tokens": 879,
+          "total_tokens": 887,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 879
+        },
+        "finish_reason": "stop",
+        "elapsed_seconds": 1.797
+      }
+    ],
+    "logs": "[模型请求 1/5]\n"
+  },
+  {
+    "case": "精确计算",
+    "prompt": "请使用计算工具算出 123 乘以 456，简短回答。",
+    "answer": "123 × 456 = **56088**",
+    "error": null,
+    "model_requests": 2,
+    "tool_calls": 1,
+    "total_tokens": 1966,
+    "tool_errors": [],
+    "output_truncated": false,
+    "events": [
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 1,
+        "usage": {
+          "completion_tokens": 69,
+          "prompt_tokens": 888,
+          "total_tokens": 957,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 640
+          },
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 248
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.371
+      },
+      {
+        "type": "tool",
+        "name": "calculate",
+        "arguments": {
+          "operation": "multiply",
+          "a": 123.0,
+          "b": 456.0
+        },
+        "elapsed_seconds": 0.0,
+        "result": {
+          "operation": "multiply",
+          "a": 123.0,
+          "b": 456.0,
+          "result": 56088.0
+        }
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 2,
+        "usage": {
+          "completion_tokens": 9,
+          "prompt_tokens": 1000,
+          "total_tokens": 1009,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 768
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 232
+        },
+        "finish_reason": "stop",
+        "elapsed_seconds": 1.163
+      }
+    ],
+    "logs": "[模型请求 1/5]\n[工具] calculate 参数：{\"operation\": \"multiply\", \"a\": 123, \"b\": 456}\n[工具结果] {\"operation\": \"multiply\", \"a\": 123.0, \"b\": 456.0, \"result\": 56088.0}\n[模型请求 2/5]\n"
+  },
+  {
+    "case": "网页搜索",
+    "prompt": "用 web_search 搜索 Hugging Face Agents Course 官方课程，最多返回两条搜索结果，给出官方入口 URL。",
+    "answer": "搜索结果（2条）：\n\n1. **The Hugging Face Agents Course — GitHub**\n   https://github.com/huggingface/agents-course\n\n2. **The Hugging Face AI Agents Course（课程注册页）**\n   https://huggingface.us17.list-manage.com/subscribe?u=7f57e683fa28b51bfc493d048&id=9ed45a3ef6\n\n**官方入口 URL：** 课程内容通常托管在 Hugging Face 官方学习平台，正式首页为 https://huggingface.co/learn/agents-course（本次搜索结果未直接返回该地址，建议以 GitHub 仓库中的链接为准核实）。",
+    "error": null,
+    "model_requests": 2,
+    "tool_calls": 1,
+    "total_tokens": 2291,
+    "tool_errors": [],
+    "output_truncated": false,
+    "events": [
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 1,
+        "usage": {
+          "completion_tokens": 60,
+          "prompt_tokens": 897,
+          "total_tokens": 957,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 640
+          },
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 257
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.418
+      },
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "Hugging Face Agents Course official",
+          "max_results": 2
+        },
+        "elapsed_seconds": 1.844,
+        "result": {
+          "provider": "duckduckgo",
+          "results": [
+            {
+              "title": "The Hugging Face Agents Course - GitHub",
+              "url": "https://github.com/huggingface/agents-course",
+              "snippet": "The Hugging Face Agents Course If you like the course, don't hesitate to ⭐ star this repository. This helps us to make the course more visible 🤗."
+            },
+            {
+              "title": "The Hugging Face AI Agents Course",
+              "url": "https://huggingface.us17.list-manage.com/subscribe?u=7f57e683fa28b51bfc493d048&id=9ed45a3ef6",
+              "snippet": "The Hugging Face AI Agents Course 🤗 Register now for the Hugging Face Agents Course 🤗! In this free course, you will: 📖 Learn the basics of Agents from scratch. 🕵️ Build your own Agents using the latest libraries and tools. 🎓 Earn a certificate of completion to showcase your achievement."
+            }
+          ],
+          "message": "找到搜索结果"
+        }
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 2,
+        "usage": {
+          "completion_tokens": 143,
+          "prompt_tokens": 1191,
+          "total_tokens": 1334,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 896
+          },
+          "prompt_cache_hit_tokens": 896,
+          "prompt_cache_miss_tokens": 295
+        },
+        "finish_reason": "stop",
+        "elapsed_seconds": 1.505
+      }
+    ],
+    "logs": "[模型请求 1/5]\n[工具] web_search 参数：{\"query\": \"Hugging Face Agents Course official\", \"max_results\": 2}\n[工具结果] {\"provider\": \"duckduckgo\", \"results\": [{\"title\": \"The Hugging Face Agents Course - GitHub\", \"url\": \"https://github.com/huggingface/agents-course\", \"snippet\": \"The Hugging Face Agents Course If you like the course, don't hesitate to ⭐ star this repository. This helps us to make the course more visible 🤗.\"}, {\"title\": \"The Hugging Face AI Agents Course\", \"url\": \"https://huggingface.us17.list-manage.\n[模型请求 2/5]\n"
+  },
+  {
+    "case": "网页读取",
+    "prompt": "请直接读取 https://example.com/ 的正文，简短说明这个网站的用途，并附来源 URL。",
+    "answer": "**用途**：这是 IANA 保留的示例域名，仅供文档、教程中作示例使用，无需授权即可引用；它本身不提供任何服务，也不应被依赖用于测试或监控。\n\n**来源**：https://example.com/",
+    "error": null,
+    "model_requests": 2,
+    "tool_calls": 1,
+    "total_tokens": 1997,
+    "tool_errors": [],
+    "output_truncated": false,
+    "events": [
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 1,
+        "usage": {
+          "completion_tokens": 43,
+          "prompt_tokens": 896,
+          "total_tokens": 939,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 640
+          },
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 256
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.319
+      },
+      {
+        "type": "tool",
+        "name": "read_webpage",
+        "arguments": {
+          "url": "https://example.com/"
+        },
+        "elapsed_seconds": 1.02,
+        "result": {
+          "url": "https://example.com/",
+          "title": "Example Domain",
+          "content": "This domain is for use in documentation examples without needing permission. This is not a service; avoid relying on it for testing and monitoring purposes.",
+          "truncated": false
+        }
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 2,
+        "usage": {
+          "completion_tokens": 52,
+          "prompt_tokens": 1006,
+          "total_tokens": 1058,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 768
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 238
+        },
+        "finish_reason": "stop",
+        "elapsed_seconds": 1.242
+      }
+    ],
+    "logs": "[模型请求 1/5]\n[工具] read_webpage 参数：{\"url\": \"https://example.com/\"}\n[工具结果] {\"url\": \"https://example.com/\", \"title\": \"Example Domain\", \"content\": \"This domain is for use in documentation examples without needing permission. This is not a service; avoid relying on it for testing and monitoring purposes.\", \"truncated\": false}\n[模型请求 2/5]\n"
+  },
+  {
+    "case": "搜索后读取",
+    "prompt": "先用 web_search 搜索 Hugging Face Agents Course 官方 GitHub 仓库，再用 read_webpage 读取搜索返回的仓库 URL，用两句话说明课程内容并附来源 URL。",
+    "answer": "说明：搜索工具（web_search）本次连续三次调用均返回工具执行失败（DDGSException），因此我改为直接读取官方仓库地址 https://github.com/huggingface/agents-course ，以下内容来自该页面实际正文。\n\n**课程内容（两句话）**\n\nHugging Face Agents Course 是一门免费课程，共分 4 个单元，从智能体（Agents）与 LLM 的基础概念讲起，逐步深入到 smolagents、LlamaIndex、LangGraph 等 AI Agent 框架的使用，以及 Agentic RAG、可观测性与评估等进阶主题。课程最后以一个「创建、测试并认证你的 Agent」的期末项目收尾，包含自动化评估与学员成绩排行榜，学习前提是具备 Python 和 LLM 基础知识。\n\n**来源 URL**：https://github.com/huggingface/agents-course\n\n（补充：课程注册页 https://bit.ly/hf-learn-agents ，课程正文 https://hf.co/learn/agents-course ，均来自该仓库页面。）",
+    "error": null,
+    "model_requests": 5,
+    "tool_calls": 4,
+    "total_tokens": 6865,
+    "tool_errors": [
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "Hugging Face Agents Course official GitHub repository",
+          "max_results": 5
+        },
+        "elapsed_seconds": 1.269,
+        "result": {
+          "error": {
+            "code": "execution_error",
+            "message": "工具执行失败",
+            "type": "DDGSException"
+          }
+        }
+      },
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "huggingface agents-course github",
+          "max_results": 5
+        },
+        "elapsed_seconds": 1.279,
+        "result": {
+          "error": {
+            "code": "execution_error",
+            "message": "工具执行失败",
+            "type": "DDGSException"
+          }
+        }
+      },
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "Hugging Face Agents Course",
+          "max_results": 5
+        },
+        "elapsed_seconds": 1.275,
+        "result": {
+          "error": {
+            "code": "execution_error",
+            "message": "工具执行失败",
+            "type": "DDGSException"
+          }
+        }
+      }
+    ],
+    "output_truncated": false,
+    "events": [
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 1,
+        "usage": {
+          "completion_tokens": 75,
+          "prompt_tokens": 913,
+          "total_tokens": 988,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 768
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 145
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.185
+      },
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "Hugging Face Agents Course official GitHub repository",
+          "max_results": 5
+        },
+        "elapsed_seconds": 1.269,
+        "result": {
+          "error": {
+            "code": "execution_error",
+            "message": "工具执行失败",
+            "type": "DDGSException"
+          }
+        }
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 2,
+        "usage": {
+          "completion_tokens": 73,
+          "prompt_tokens": 1027,
+          "total_tokens": 1100,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 768
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 259
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.217
+      },
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "huggingface agents-course github",
+          "max_results": 5
+        },
+        "elapsed_seconds": 1.279,
+        "result": {
+          "error": {
+            "code": "execution_error",
+            "message": "工具执行失败",
+            "type": "DDGSException"
+          }
+        }
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 3,
+        "usage": {
+          "completion_tokens": 71,
+          "prompt_tokens": 1139,
+          "total_tokens": 1210,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 896
+          },
+          "prompt_cache_hit_tokens": 896,
+          "prompt_cache_miss_tokens": 243
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.555
+      },
+      {
+        "type": "tool",
+        "name": "web_search",
+        "arguments": {
+          "query": "Hugging Face Agents Course",
+          "max_results": 5
+        },
+        "elapsed_seconds": 1.275,
+        "result": {
+          "error": {
+            "code": "execution_error",
+            "message": "工具执行失败",
+            "type": "DDGSException"
+          }
+        }
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 4,
+        "usage": {
+          "completion_tokens": 65,
+          "prompt_tokens": 1249,
+          "total_tokens": 1314,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 1024
+          },
+          "prompt_cache_hit_tokens": 1024,
+          "prompt_cache_miss_tokens": 225
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.036
+      },
+      {
+        "type": "tool",
+        "name": "read_webpage",
+        "arguments": {
+          "url": "https://github.com/huggingface/agents-course"
+        },
+        "elapsed_seconds": 1.722,
+        "result": {
+          "url": "https://github.com/huggingface/agents-course",
+          "title": "GitHub - huggingface/agents-course: This repository contains the Hugging Face Agents Course. · GitHub",
+          "content": "If you like the course, don't hesitate to ⭐ star this repository. This helps us to make the course more visible 🤗.\nThe course is divided into 4 units. These will take you from the basics of agents to a final assignment with a benchmark.\nSign up here (it's free) 👉 https://bit.ly/hf-learn-agents\nYou can access the course here 👉 https://hf.co/learn/agents-course\n| Unit | Topic | Description | \n|---|---|---|\n| 0 | Welcome to the Course | Welcome, guidelines, necessary tools, and course overview. | \n| 1 | Introduction to Agents | Definition of agents, LLMs, model family tree, and special tokens. | \n| 1 Bonus | Fine-tuning an LLM for Function-calling | Learn how to fine-tune an LLM for Function-Calling | \n| 2 | Frameworks for AI Agents | Overview of smolagents, LangGraph and LlamaIndex. | \n| 2.1 | The Smolagents Framework | Learn how to build effective agents using the smolagents library, a lightweight framework for creating capable AI agents. | \n| 2.2 | The LlamaIndex Framework | Learn how to build LLM-powered agents over your data using indexes and workflows using the LlamaIndex toolkit. | \n| 2.3 | The LangGraph Framework | Learn how to build production-ready applications using the LangGraph framework giving you control tools over the flow of your agent. | \n| 2 Bonus | Observability and Evaluation | Learn how to trace and evaluate your agents. | \n| 3 | Use Case for Agentic RAG | Learn how to use Agentic RAG to help agents respond to different use cases using various frameworks. | \n| 4 | Final Project - Create, Test and Certify Your Agent | Automated evaluation of agents and leaderboard with student results. | \n| 3 Bonus | Agents in Games with Pokemon | Explore the exciting intersection of AI Agents and games. | \n- Basic knowledge of Python\n- Basic knowledge of LLMs\nIf you want to contribute to this course, you're welcome to do so. Feel free to open an issue or join the discussion in the Discord. For specific contributions, here are some guidelines:\nIf you find a small typo or grammar mistake, please fix it yourself and submit a pull request. This is very helpful for students.\nIf you want to add a new unit, please create an issue in the repository, describe the unit, and why it should be added. We will discuss it and if it's a good addition, we can collaborate on it.\nTo cite this repository in publications:\n@misc{agents-course,\n  author = {Burtenshaw, Ben and Thomas, Joffrey and Simonini, Thomas and Paniego, Sergio},\n  title = {The Hugging Face Agents Course},\n  year = {2025},\n  howpublished = {\\url{https://github.com/huggingface/agents-course}},\n  note = {GitHub repository},\n}",
+          "truncated": false
+        }
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 5,
+        "usage": {
+          "completion_tokens": 216,
+          "prompt_tokens": 2037,
+          "total_tokens": 2253,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 1280
+          },
+          "prompt_cache_hit_tokens": 1280,
+          "prompt_cache_miss_tokens": 757
+        },
+        "finish_reason": "stop",
+        "elapsed_seconds": 1.843
+      }
+    ],
+    "logs": "[模型请求 1/5]\n[工具] web_search 参数：{\"query\": \"Hugging Face Agents Course official GitHub repository\", \"max_results\": 5}\n[工具结果] {\"error\": {\"code\": \"execution_error\", \"message\": \"工具执行失败\", \"type\": \"DDGSException\"}}\n[模型请求 2/5]\n[工具] web_search 参数：{\"query\": \"huggingface agents-course github\", \"max_results\": 5}\n[工具结果] {\"error\": {\"code\": \"execution_error\", \"message\": \"工具执行失败\", \"type\": \"DDGSException\"}}\n[模型请求 3/5]\n[工具] web_search 参数：{\"query\": \"Hugging Face Agents Course\", \"max_results\": 5}\n[工具结果] {\"error\": {\"code\": \"execution_error\", \"message\": \"工具执行失败\", \"type\": \"DDGSException\"}}\n[模型请求 4/5]\n[工具] read_webpage 参数：{\"url\": \"https://github.com/huggingface/agents-course\"}\n[工具结果] {\"url\": \"https://github.com/huggingface/agents-course\", \"title\": \"GitHub - huggingface/agents-course: This repository contains the Hugging Face Agents Course. · GitHub\", \"content\": \"If you like the course, don't hesitate to ⭐ star this repository. This helps us to make the course more visible 🤗.\\nThe course is divided into 4 units. These will take you from the basics of agents to a final assignmen\n[模型请求 5/5]\n"
+  },
+  {
+    "case": "图片理解",
+    "prompt": "请阅读 images/demo-chart.png，告诉我 2024 和 2025 年对应的两个数值。",
+    "answer": "根据图表读取结果：\n\n- **2024 年：120 units**\n- **2025 年：150 units**\n\n补充说明：\n- 图表类型为**水平条形图**（横向柱状图）。\n- 纵轴为年份（2024、2025），横轴为数值轴，但图中未绘制横轴刻度。\n- 标题为 \"DEMO DATA (units)\"，来源标注为 \"Source: synthetic test fixture\"，这看起来是一份合成/演示数据。\n\n如果你需要，我可以进一步算一下两年的变化幅度（同比增长 25%）。",
+    "error": null,
+    "model_requests": 3,
+    "tool_calls": 1,
+    "total_tokens": 2805,
+    "tool_errors": [],
+    "output_truncated": false,
+    "events": [
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 1,
+        "usage": {
+          "completion_tokens": 100,
+          "prompt_tokens": 897,
+          "total_tokens": 997,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 640
+          },
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 257
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.372
+      },
+      {
+        "type": "tool",
+        "name": "analyze_image",
+        "arguments": {
+          "image_source": "images/demo-chart.png",
+          "question": "这张图表中 2024 年和 2025 年分别对应的数值是多少？请给出具体数字和单位，并说明图表类型与坐标轴含义。"
+        },
+        "elapsed_seconds": 1.86,
+        "result": {
+          "image_source": "images/demo-chart.png",
+          "analysis": "根据图片内容，直接观察到的信息如下：\n\n*   **2024 年对应数值**：120（单位：units）。\n*   **2025 年对应数值**：150（单位：units）。\n*   **图表类型**：水平条形图（横向柱状图）。\n*   **坐标轴含义**：\n    *   纵轴（分类轴）：表示年份（2024、2025）。\n    *   横轴（数值轴）：表示对应的数据值。不过，图片中并未画出带有刻度线和刻度值的横轴，因此横轴的具体刻度分布无法确定。\n*   **其他信息**：图表标题为“DEMO DATA (units)”，底部标注来源为“Source: synthetic test fixture”。\n\n以上内容均来自图片中的文字和图形的直接观察，未进行超出图片信息的推测。"
+        }
+      },
+      {
+        "type": "model",
+        "kind": "vision",
+        "request": 2,
+        "usage": {
+          "input_tokens": 305,
+          "input_tokens_details": {
+            "cached_tokens": 0
+          },
+          "output_tokens": 171,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 476
+        },
+        "status": "completed",
+        "elapsed_seconds": 1.847
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 3,
+        "usage": {
+          "completion_tokens": 118,
+          "prompt_tokens": 1214,
+          "total_tokens": 1332,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 896
+          },
+          "prompt_cache_hit_tokens": 896,
+          "prompt_cache_miss_tokens": 318
+        },
+        "finish_reason": "stop",
+        "elapsed_seconds": 1.526
+      }
+    ],
+    "logs": "[模型请求 1/5]\n[工具] analyze_image 参数：{\"image_source\": \"images/demo-chart.png\", \"question\": \"这张图表中 2024 年和 2025 年分别对应的数值是多少？请给出具体数字和单位，并说明图表类型与坐标轴含义。\"}\n[工具结果] {\"image_source\": \"images/demo-chart.png\", \"analysis\": \"根据图片内容，直接观察到的信息如下：\\n\\n*   **2024 年对应数值**：120（单位：units）。\\n*   **2025 年对应数值**：150（单位：units）。\\n*   **图表类型**：水平条形图（横向柱状图）。\\n*   **坐标轴含义**：\\n    *   纵轴（分类轴）：表示年份（2024、2025）。\\n    *   横轴（数值轴）：表示对应的数据值。不过，图片中并未画出带有刻度线和刻度值的横轴，因此横轴的具体刻度分布无法确定。\\n*   **其他信息**：图表标题为“DEMO DATA (units)”，底部标注来源为“Source: synthetic test fixture”。\\n\\n以上内容均来自图片中的文字和图形的直接观察，未进行超出\n[模型请求 2/5]\n"
+  },
+  {
+    "case": "看图后计算",
+    "prompt": "阅读 images/demo-chart.png，提取 2024 和 2025 年的数值，然后使用计算工具算出增长百分比。简短给出数据和结果。",
+    "answer": "**数据（图表标注为 \"DEMO DATA (units)\"，synthetic test fixture）：**\n- 2024 年：120\n- 2025 年：150\n\n**计算：**\n- 增量：150 − 120 = 30\n- 增长率：30 ÷ 120 = 0.25 → **+25%**\n\n即 2024 → 2025 增长了 25%。",
+    "error": null,
+    "model_requests": 4,
+    "tool_calls": 3,
+    "total_tokens": 4044,
+    "tool_errors": [],
+    "output_truncated": false,
+    "events": [
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 1,
+        "usage": {
+          "completion_tokens": 100,
+          "prompt_tokens": 907,
+          "total_tokens": 1007,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 768
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 139
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.074
+      },
+      {
+        "type": "tool",
+        "name": "analyze_image",
+        "arguments": {
+          "image_source": "images/demo-chart.png",
+          "question": "提取 2024 年和 2025 年的数值（如果是柱状图/折线图，请读取每个年份对应的数据标签或近似值）。"
+        },
+        "elapsed_seconds": 1.309,
+        "result": {
+          "image_source": "images/demo-chart.png",
+          "analysis": "根据图片，可以直接观察到以下数值：\n*   2024年：**120**\n*   2025年：**150**\n\n图中没有表示数值的数据标签以外的近似值需求，这两个数字在年份旁明确标出。图片标题为“DEMO DATA (units)”，底部来源标注为“Source: synthetic test fixture”，这些均为直接观察到的文字信息。"
+        }
+      },
+      {
+        "type": "model",
+        "kind": "vision",
+        "request": 2,
+        "usage": {
+          "input_tokens": 304,
+          "input_tokens_details": {
+            "cached_tokens": 0
+          },
+          "output_tokens": 76,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 380
+        },
+        "status": "completed",
+        "elapsed_seconds": 1.308
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 3,
+        "usage": {
+          "completion_tokens": 128,
+          "prompt_tokens": 1118,
+          "total_tokens": 1246,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 896
+          },
+          "prompt_cache_hit_tokens": 896,
+          "prompt_cache_miss_tokens": 222
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.119
+      },
+      {
+        "type": "tool",
+        "name": "calculate",
+        "arguments": {
+          "operation": "subtract",
+          "a": 150.0,
+          "b": 120.0
+        },
+        "elapsed_seconds": 0.0,
+        "result": {
+          "operation": "subtract",
+          "a": 150.0,
+          "b": 120.0,
+          "result": 30.0
+        }
+      },
+      {
+        "type": "tool",
+        "name": "calculate",
+        "arguments": {
+          "operation": "divide",
+          "a": 30.0,
+          "b": 120.0
+        },
+        "elapsed_seconds": 0.0,
+        "result": {
+          "operation": "divide",
+          "a": 30.0,
+          "b": 120.0,
+          "result": 0.25
+        }
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 4,
+        "usage": {
+          "completion_tokens": 86,
+          "prompt_tokens": 1325,
+          "total_tokens": 1411,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 1152
+          },
+          "prompt_cache_hit_tokens": 1152,
+          "prompt_cache_miss_tokens": 173
+        },
+        "finish_reason": "stop",
+        "elapsed_seconds": 1.311
+      }
+    ],
+    "logs": "[模型请求 1/5]\n[工具] analyze_image 参数：{\"image_source\": \"images/demo-chart.png\", \"question\": \"提取 2024 年和 2025 年的数值（如果是柱状图/折线图，请读取每个年份对应的数据标签或近似值）。\"}\n[工具结果] {\"image_source\": \"images/demo-chart.png\", \"analysis\": \"根据图片，可以直接观察到以下数值：\\n*   2024年：**120**\\n*   2025年：**150**\\n\\n图中没有表示数值的数据标签以外的近似值需求，这两个数字在年份旁明确标出。图片标题为“DEMO DATA (units)”，底部来源标注为“Source: synthetic test fixture”，这些均为直接观察到的文字信息。\"}\n[模型请求 2/5]\n[工具] calculate 参数：{\"operation\": \"subtract\", \"a\": 150, \"b\": 120}\n[工具结果] {\"operation\": \"subtract\", \"a\": 150.0, \"b\": 120.0, \"result\": 30.0}\n[工具] calculate 参数：{\"operation\": \"divide\", \"a\": 30, \"b\": 120}\n[工具结果] {\"operation\": \"divide\", \"a\": 30.0, \"b\": 120.0, \"result\": 0.25}\n[模型请求 3/5]\n"
+  },
+  {
+    "case": "工具错误",
+    "prompt": "请用 calculate 计算 10 除以 0。如果工具返回错误，就说明原因并停止，不要编造数值。",
+    "answer": "工具返回了错误：`division_by_zero` —— 除数不能为零。\n\n因此 10 ÷ 0 无法计算。在数学上这是未定义的（无意义），不存在任何有限的数值结果，我也不会给出编造的答案。到此停止。",
+    "error": null,
+    "model_requests": 2,
+    "tool_calls": 1,
+    "total_tokens": 2021,
+    "tool_errors": [
+      {
+        "type": "tool",
+        "name": "calculate",
+        "arguments": {
+          "operation": "divide",
+          "a": 10.0,
+          "b": 0.0
+        },
+        "elapsed_seconds": 0.0,
+        "result": {
+          "error": {
+            "code": "division_by_zero",
+            "message": "除数不能为零"
+          }
+        }
+      }
+    ],
+    "output_truncated": false,
+    "events": [
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 1,
+        "usage": {
+          "completion_tokens": 68,
+          "prompt_tokens": 901,
+          "total_tokens": 969,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 640
+          },
+          "prompt_cache_hit_tokens": 640,
+          "prompt_cache_miss_tokens": 261
+        },
+        "finish_reason": "tool_calls",
+        "elapsed_seconds": 1.502
+      },
+      {
+        "type": "tool",
+        "name": "calculate",
+        "arguments": {
+          "operation": "divide",
+          "a": 10.0,
+          "b": 0.0
+        },
+        "elapsed_seconds": 0.0,
+        "result": {
+          "error": {
+            "code": "division_by_zero",
+            "message": "除数不能为零"
+          }
+        }
+      },
+      {
+        "type": "model",
+        "kind": "agent",
+        "request": 2,
+        "usage": {
+          "completion_tokens": 52,
+          "prompt_tokens": 1000,
+          "total_tokens": 1052,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 768
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 232
+        },
+        "finish_reason": "stop",
+        "elapsed_seconds": 1.233
+      }
+    ],
+    "logs": "[模型请求 1/5]\n[工具] calculate 参数：{\"operation\": \"divide\", \"a\": 10, \"b\": 0}\n[工具结果] {\"error\": {\"code\": \"division_by_zero\", \"message\": \"除数不能为零\"}}\n[模型请求 2/5]\n"
+  }
+]
