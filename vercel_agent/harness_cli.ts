@@ -21,6 +21,9 @@ async function main() {
     const { directory, record } = await new MinimalHarness(bridge, config).run({ skill, task });
     console.log(redact(record.result?.answer ?? `运行未完成：${record.result?.error ?? record.harness_error}`));
     console.log(`\n运行状态：${record.runtime_status}；任务验收：${record.task_verdict}`);
+    for (const item of record.automatic_checks?.items ?? []) {
+      console.log(redact(`自动检查 ${item.passed ? '通过' : '未通过'} ${item.name}：${item.detail}`));
+    }
     console.log(`结果目录：${directory}`);
     if (record.result) console.log(`模型请求 ${record.result.model_requests} 次，工具 ${record.result.tool_calls} 次，tokens ${record.result.total_tokens}`);
     if (record.runtime_status === 'failed') process.exitCode = 1;

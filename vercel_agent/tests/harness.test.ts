@@ -49,7 +49,12 @@ test('不同 Skill 复用同一工具库，任务上下文隔离，运行记录�
   assert.equal(second.record.result?.tool_calls, 0);
   assert.equal(first.record.runtime_status, 'completed');
   assert.equal(first.record.task_verdict, 'needs_review');
-  assert.equal(second.record.task_verdict, 'needs_review');
+  assert.equal(first.record.automatic_checks, null);
+  assert.equal(second.record.runtime_status, 'completed');
+  assert.equal(second.record.task_verdict, 'failed_checks');
+  assert.equal(second.record.automatic_checks?.items.find(item => item.name === 'read_succeeded')?.passed, false);
+  assert.equal(JSON.parse(await readFile(join(second.directory, 'run.json'), 'utf8')).task_verdict, 'failed_checks');
+  assert.match(await readFile(join(second.directory, 'answer.md'), 'utf8'), /任务验收：failed_checks[\s\S]*自动检查：未通过/);
   assert.notEqual(first.directory, second.directory);
   assert.equal((await readdir(runs)).length, 2);
   const saved = JSON.parse(await readFile(join(first.directory, 'run.json'), 'utf8'));

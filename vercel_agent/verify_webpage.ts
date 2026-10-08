@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 import { VercelLoop, type Configuration } from './agent.js';
 import { PythonBridge, ROOT, loadLocalEnv, redact } from './bridge.js';
+import { normaliseWhitespace as normalise, tableRows } from './checks.js';
 
 const url = 'https://xn--ygr25xpohxwz.com/zero-to-fullstack/lessons/module-6-3/';
 const themes = ['持久化动机', '四种存储', '文件局限', '数据库范围', '历史范围'];
@@ -43,11 +44,8 @@ try {
   report.source_metadata = page ? { url: page.url, chars: page.content.length, truncated: page.truncated,
     sha256: createHash('sha256').update(page.content).digest('hex') } : null;
   const answer = result.answer ?? '';
-  const rows = answer.split('\n').filter(line => line.trim().startsWith('|'))
-    .map(line => line.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map(cell => cell.trim()))
-    .filter(cells => !cells.every(cell => /^:?-+:?$/.test(cell)));
+  const rows = tableRows(answer);
   const dataRows = rows.filter(cells => themes.includes(cells[0]));
-  const normalise = (value: string) => value.replace(/\s+/g, '');
   const content = normalise(page?.content ?? '');
   report.evidence_checks = dataRows.map(cells => {
     const quotes = [...(cells[2] ?? '').matchAll(/`([^`]+)`/g)].map(match => match[1]);
