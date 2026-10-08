@@ -107,7 +107,7 @@ class Tool:
 TOOL_REGISTRY = {
     tool.name: tool for tool in [
         Tool("web_search", "使用 DuckDuckGo 搜索网页，返回标题、URL 和摘要。需要最新或外部信息时使用；搜索摘要不是完整正文。", SearchParameters, web_search),
-        Tool("read_webpage", "读取指定公开网页的正文。已有 URL 时直接使用；需要核对搜索结果或详细总结时读取原文。truncated=true 表示正文不完整。", WebpageParameters, read_webpage),
+        Tool("read_webpage", "读取指定公开网页的正文和可识别脚注。已有 URL 时直接使用。truncated 仅表示提取文本被长度裁切；false 不保证整页完整，须关注 completeness 与 coverage_note。", WebpageParameters, read_webpage),
         Tool("calculate", "精确执行两个数的加减乘除。operation 为 add/subtract/multiply/divide；多步计算可连续调用。百分比增长用 (新值-旧值)/旧值*100。", CalculateParameters, calculate),
         Tool("analyze_image", "阅读图片中的文字、物体、截图或图表，回答 question；看不清的信息应明确标注。需要图片内容时调用。图片路径应由用户提供，或使用公开图片 URL。", VisionParameters, analyze_image),
     ]

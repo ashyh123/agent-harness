@@ -3,4 +3,5 @@ pydantic==2.12.5
 ddgs==9.16.0
 httpx==0.28.1
 trafilatura==2.3.0
+lxml==6.1.3
 pillow==12.3.0

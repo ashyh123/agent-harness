@@ -8,10 +8,33 @@ from urllib.parse import urljoin, urlsplit
 import httpx
 import trafilatura
 from ddgs import DDGS
+from lxml import html as html_tree
 
 from .errors import ToolError
 
 MAX_WEB_CHARS = 10000
+MAX_FOOTNOTE_CHARS = 3000
+
+
+def extract_footnotes(data):
+    """补取正文算法容易过滤的语义脚注和常见脚注锚点；不执行网页脚本。"""
+    root = html_tree.fromstring(data)
+    for element in root.xpath('//script | //style | //template | //svg'):
+        element.drop_tree()
+    candidates = root.xpath('//*[@role="doc-footnote" or @role="doc-endnote"] | '
+                            '//*[@role="doc-endnotes"]//li | //li[@id] | //div[@id]')
+    notes = []
+    seen = set()
+    for node in candidates:
+        identifier = node.get('id', '')
+        semantic = node.get('role') in {'doc-footnote', 'doc-endnote'} or node.xpath('ancestor::*[@role="doc-endnotes"]')
+        if not semantic and not re.match(r'^(?:citation-bottom-\d+|footnote[-_]?\d+|fn[-_]?\d+)$', identifier, re.I):
+            continue
+        text = ' '.join(' '.join(node.itertext()).split())
+        if text and text not in seen:
+            notes.append(text)
+            seen.add(text)
+    return notes
 
 
 def validate_url(url):
@@ -59,15 +82,30 @@ def web_search(query, max_results=3, *, context=None):
 
 def read_webpage(url, *, context=None):
     data, final_url, content_type = fetch_bytes(url, 2 * 1024 * 1024, "text/html,application/xhtml+xml,text/plain")
+    notes = []
     if "text/plain" in content_type:
         content = data.decode("utf-8", errors="replace")
         title = ""
     elif "text/html" in content_type or "application/xhtml+xml" in content_type:
         content = trafilatura.extract(data, include_comments=False, include_tables=True)
+        notes = extract_footnotes(data) if content else []
         title_match = re.search(r"<title[^>]*>(.*?)</title>", data.decode("utf-8", errors="replace"), re.I | re.S)
         title = html.unescape(title_match.group(1)).strip()[:300] if title_match else ""
     else:
         raise ToolError("unsupported_content", "此工具读取 HTML 或纯文本；图片请使用 analyze_image")
     if not content or not content.strip():
         raise ToolError("extraction_failed", "没有提取到正文；页面可能需要 JavaScript、登录或禁止访问")
-    return {"url": final_url, "title": title, "content": content[:MAX_WEB_CHARS], "truncated": len(content) > MAX_WEB_CHARS}
+    # 给补充脚注预留空间，避免长正文把尾部的重要限定再次挤掉。
+    heading = '\n\n[网页脚注]\n'
+    reserved = len(heading) + min(len('\n'.join(notes)), MAX_FOOTNOTE_CHARS) if notes else 0
+    # 只对将实际返回的正文去重；位于裁切边界外的脚注仍须补回。
+    normalized_body = ' '.join(content[:MAX_WEB_CHARS - reserved].split())
+    extra_notes = [note for note in notes if note not in normalized_body]
+    note_text = '\n'.join(extra_notes)
+    supplement = heading + note_text[:MAX_FOOTNOTE_CHARS] if note_text else ''
+    body_budget = MAX_WEB_CHARS - len(supplement)
+    truncated = len(content) > body_budget or len(note_text) > MAX_FOOTNOTE_CHARS
+    return {"url": final_url, "title": title, "content": content[:body_budget] + supplement,
+            "truncated": truncated, "footnotes_found": len(notes),
+            "completeness": "not_verified",
+            "coverage_note": "truncated 仅表示提取文本是否被长度上限裁切；未验证整页覆盖，动态内容、图片及未识别脚注可能缺失。"}
