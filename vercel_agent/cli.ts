@@ -18,7 +18,7 @@ try {
   async function runTurn(prompt: string) {
     const turnStart = messages.length;
     messages.push({ role: 'user', content: prompt });
-    const result = await agent.run(messages);
+    const result = await agent.run(messages, { onNotice: notice => console.log(redact(notice)) });
     if (result.error) messages.splice(turnStart);
     await mkdir(join(ROOT, 'reports'), { recursive: true });
     await writeFile(join(ROOT, 'reports/vercel-last-run.json'), redact(JSON.stringify({ prompt, ...result }, null, 2)));

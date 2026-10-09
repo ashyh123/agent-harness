@@ -1,5 +1,6 @@
 """本地 JSON Lines 桥接；复用原工具、参数校验和共享预算，不启动 HTTP 服务。"""
 import json
+import math
 import os
 import sys
 import time
@@ -34,6 +35,7 @@ class Worker:
         self.registry = TOOL_REGISTRY
         self.outer_requests = 0
         self.pending = {}
+        self.max_steps = MAX_STEPS
 
     @property
     def client(self):
@@ -51,6 +53,14 @@ class Worker:
                     "max_tool_calls": 8, "max_seconds": 90, "max_output_tokens": MAX_OUTPUT_TOKENS}
         if operation == "start":
             limits = request.get("limits", {})
+            for name, value in limits.items():
+                if name == 'max_seconds':
+                    valid = type(value) in {int, float} and math.isfinite(value) and value > 0
+                else:
+                    valid = type(value) is int and value > 0
+                if not valid:
+                    raise ValueError("次数预算必须是正整数，耗时预算必须是正的有限数值")
+            self.max_steps = limits.get("max_steps", MAX_STEPS)
             self.context = RunContext(client=self.client, max_model_requests=limits.get("max_model_requests", MAX_MODEL_REQUESTS),
                                       max_tool_calls=limits.get("max_tool_calls", 8), max_seconds=limits.get("max_seconds", 90))
             self.registry = fixture_registry(request.get("fixtures", {}))
@@ -72,8 +82,8 @@ class Worker:
             try:
                 value = self.registry[request["name"]].parameters.model_validate(request["arguments"])
                 return {"valid": True, "value": value.model_dump()}
-            except ValidationError:
-                return {"valid": False}
+            except ValidationError as error:
+                return {"valid": False, "errors": error.errors(include_input=False, include_url=False, include_context=False)[:5]}
         if operation == "call_tool":
             first_event = len(context.events)
             result = execute_tool(request["name"], json.dumps(request["arguments"], ensure_ascii=False),
@@ -92,9 +102,17 @@ class Worker:
             context.events.append({"type": "tool", "name": request["name"], "tool_call_id": request["tool_call_id"],
                                    "result": result, "elapsed_seconds": 0})
             return result
+        if operation == "ensure_model_capacity":
+            context.remaining_seconds()
+            needed = request["requests"]
+            if self.outer_requests + needed > self.max_steps:
+                raise BudgetExceeded("外层模型预算不足以完成上下文压缩并继续任务")
+            if context.model_requests + needed > context.max_model_requests:
+                raise BudgetExceeded("模型请求总预算不足以完成上下文压缩并继续任务")
+            return {"available": True}
         if operation == "begin_model":
             remaining = context.remaining_seconds()
-            if self.outer_requests >= MAX_STEPS:
+            if self.outer_requests >= self.max_steps:
                 raise BudgetExceeded("已达到每轮外层模型请求上限")
             if context.model_requests >= context.max_model_requests:
                 raise BudgetExceeded("已达到每轮模型请求总数上限（含视觉工具）")

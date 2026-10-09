@@ -16,7 +16,11 @@ npm run chat
 
 SDK 入口自动读取项目 `.env`，使用同一个 DeepSeek 密钥。
 
-已加入 [最薄 Harness 的使用与原理](vercel_agent/HARNESS.md)：显式选择 Skill，复用 SDK Loop 和四个工具执行任务，每次保存独立结果与执行记录。在 `vercel_agent` 目录运行 `npm run harness -- --list` 查看可用流程。
+已加入 [最薄 Harness 的使用与原理](vercel_agent/HARNESS.md)：显式选择 Skill，复用 SDK Loop 和当前八个工具执行任务，每次保存独立结果与执行记录。在 `vercel_agent` 目录运行 `npm run harness -- --list` 查看可用流程。
+
+已加入 [统一任务入口](vercel_agent/ROUTER.md)：手动选择现有 Harness 或本机 Codex CLI，给各自发布新任务，在 `~/Documents/Agent-Runs/<agent>/<日期>/<任务ID>/` 收回回答、日志和实际文件。在 `vercel_agent` 中执行 `npm run router -- agents` 查看入口，`npm run router -- runs` 查看任务；独立工作目录执行，不接管已打开的聊天。
+
+已加入 [DeepSeek person agent 并发任务中心](vercel_agent/TASK_CENTER.md)：在 `vercel_agent` 中运行 `npm run person`。主 Agent 自动分配独立任务，后台最多并发2项，完成后收消息、回读产物、审阅；低成本候选失败按配置升级一次。原单次委派保留为 `npm run person:delegate`，见 [单次委派说明](vercel_agent/PERSON_AGENT.md)。
 
 当前阶段的实现、理解、验证结论和限制见 [SDK 与 Harness 阶段总结](SDK_HARNESS_SUMMARY.md)。
 
@@ -54,20 +58,55 @@ python agent.py
 请用计算工具计算 10 除以 0，如果失败就解释原因。
 ```
 
-## 四个工具
+## 默认工具
 
 | 工具 | 参数 | 返回内容 | 实现 |
 | --- | --- | --- | --- |
-| `web_search` | `query`，可选 `max_results`（1–5，默认 3） | 标题、URL、摘要 | `ddgs`，明确指定 DuckDuckGo，不需要额外搜索密钥 |
-| `read_webpage` | `url` | 最终 URL、标题、正文、`truncated` | HTTPX 下载，Trafilatura 提取正文 |
+| `web_search` | `query`，可选 `max_results`（1–5，默认 3） | 实际 `provider`、`attempts`、标题、URL、摘要 | Tavily 官方 SDK 的 keyless 模式 → DuckDuckGo → Yahoo，无需搜索密钥 |
+| `read_webpage` | `url` | 最终 URL、标题、正文、`truncated`、`document_id`、`content_format`、`available_formats` | HTTPX 下载，Trafilatura 召回优先提取，同一结构树生成 Markdown 与文本 |
+| `read_saved_webpage` | `document_id`，可选 `offset`、`limit`、`content_format` | 所选格式片段、来源 URL、字符范围、`next_offset`、`has_more` | 本地快照回查，不重新下载 |
 | `calculate` | `operation`、`a`、`b` | 运算及结果 | Python 有限数值算术 |
+| `read_data` | `url` 或 `text`，`data_format`，可选 `json_pointer`、`columns` | 本轮 `dataset_id`、解析格式、来源、分页数据 | 标准库 JSON/CSV 解析，不写数据文件 |
+| `query_data` | `dataset_id`，可选筛选、排序、统计、分页、`output_format` | JSON/CSV 转换结果或全量匹配记录统计 | 本轮内存查询，不重新下载、不执行任意代码 |
 | `analyze_image` | `image_source`、`question` | 图片来源及文字分析 | DeepSeek Responses API 图片输入 |
+| `save_obsidian_blog` | `document_id`、`summary`、`takeaway`、`evidence_quote` | 实际保存路径、回读核验、文件 hash | 专属 Obsidian vault 的 Markdown 写入 |
 
 `calculate` 支持 `add`、`subtract`、`multiply`、`divide`，通过注册表调用时拒绝数字字符串、布尔值、NaN、无穷大和多余参数。除零、结果溢出返回明确的工具错误。多步算式由 Agent 分步调用，无任意代码执行。
+
+数据任务先 `read_data`，然后用返回的 `dataset_id` 调用 `query_data`。下载最多 2 MiB，CSV/选中数组最多 20000 行，本轮最多 8 份数据；仅 UTF-8（支持 BOM）。CSV 必须有不重复的表头，保留字符串、空字段、引号和换行；NOAA 等带开头注释的文件显式传 `comment_prefix="#"`。JSON 用 `json_pointer` 选中嵌套数据，例如世界银行 `/1`。`columns` 选字段，`output_format="csv"` 转为 CSV；null/嵌套值明确拒绝有损转换。筛选条件全部 AND，CSV 精确匹配用字符串，数值大小用 `gt/ge/lt/le`；数值排序设置 `numeric_sort=true`。`aggregate=count/sum/mean/min/max` 在全部匹配行上执行，分页不影响统计；数值统计拒绝缺失值、布尔值和非数值文本，小数结果另附 `decimal_value`。
+
+返回最多 10000 字符，默认 5 行、最多 100 行；内容过大时缩小页并提供 `next_offset`，不裁切单元格。初次预览的单条记录过大时返回 `structure` 和 `preview_omitted`，仍保留数据 ID，后续选列或缩小 JSON 路径查询；不重复下载。原始数据仅保留在当前 RunContext 内存，下一任务释放，不能跨任务使用旧 ID；上下文压缩保留 ID、来源和分页位置，可继续查询。工具本身不写文件；Harness 仍按已有设计写运行记录。Vercel 工具目录的 [Python Code Execution](https://ai-sdk.dev/resources/tools/code-execution) 需要额外 Sandbox 凭据，本次采用标准库解析并复用共享桥接，未安装云端执行工具。
+
+搜索优先使用 `tavily-python==0.8.5` 官方 SDK 的免费 keyless 模式；失败时再尝试 DuckDuckGo 和 Yahoo，每项最多一次。显式空 key 防止 SDK 自动读取环境中的 Tavily 付费凭据；不发送 Authorization。固定 basic 搜索，关闭自动生成答案和完整原文，只映射标题、URL、摘要。每个引擎请求超时最多 5 秒，并受剩余运行时间限制。`provider` 标明实际成功的引擎，`attempts` 记录各次状态；一次工具调用最多包含三次引擎请求。失败引擎在本轮任务内暂停请求，下一轮重新尝试。Tavily keyless 限流的有效 `retry_after_seconds` 会写入尝试记录，但本轮不等待或反复请求。全部服务失败时返回 `search_unavailable` 和 `retryable=false`，工具描述要求模型停止重复搜索。正常空列表与服务失败分别记录，不能把验证页当作原文没有信息。仍沿用每轮 8 次工具调用上限。
+
+Tavily 的免费 keyless 模式支持搜索但有速率限制；DuckDuckGo、Yahoo 使用已有 DDGS 对公开搜索页面的访问。无需新账号或搜索密钥，不保证外部服务始终可用。两版 Loop 共用这项改进。运行 `cd vercel_agent` 后执行 `npm run verify:search`，可验证真实的“搜索 → 读两篇官方文章 → 简短描述”任务，阅读输入须来自搜索返回地址；会产生模型用量，完整记录保存到 `reports/search-reliability-runs/`。重新安装 Python 依赖请执行 `.venv/bin/python -m pip install -r requirements.txt`。
+
+Vercel 的工具目录有 `@tavily/ai-sdk`，但核对时最新 `0.5.0` 的 peerDependencies 只声明 AI SDK 5/6，本项目是 AI SDK 7，未强行安装。这里复用官方 Python 搜索 SDK，由现有桥接将统一 `web_search` 暴露给 Vercel Loop；没有重写循环。参考：[Tavily 官方 SDK 的 keyless 模式](https://github.com/tavily-ai/tavily-python#keyless-mode)、[Vercel 的 Tavily 工具目录](https://ai-sdk.dev/resources/tools/tavily)。
 
 搜索返回的是摘要。需要详细总结或验证事实时，再读取来源页面。网页工具只访问公开 HTTP(S) 地址，下载最多 2 MiB，最多返回 10000 字符，最多 3 次跳转，每次跳转重新检查地址。它不会执行 JavaScript，也不会自动登录；受限页面、PDF 和复杂动态页面可能无法读取。
 
 网页读取会补取语义脚注及常见脚注锚点，并在 10000 字符总额度中为补充脚注预留最多 3000 字符（另含标题分隔符）。`footnotes_found` 表示检测到的条目数；`truncated` 只说明提取文本是否被裁切，`false` 不保证完整覆盖网页。`completeness=not_verified` 和 `coverage_note` 明确提醒模型：动态内容、图片及未识别脚注可能缺失。网页 Skill 要求同时检查正文和脚注，并保留评测范围、比较条件、模拟估计等限定。
+
+每次成功读取网页，裁切前的提取正文和补充脚注先保存到 `reports/webpage-snapshots/<document_id>.json`，再向模型返回有界预览和文档 ID。HTML 使用 `favor_recall=True` 优先保留更多内容；从同一次提取的结构树生成 Markdown 与 text，二者存在同一个快照中。默认预览返回 Markdown，text 保留原文措辞供核对，不把两份全文同时送进上下文。ID 由快照内容生成，同一份资料可以跨任务、跨进程回查。快照使用临时文件完整写入后替换，文件不进入 Git。
+
+text 去除加粗和链接目标等格式标记，仍保留列表、表格的组织。Markdown 保留标题层级、列表、表格、加粗及链接。两者都由程序转换，不调用模型改写。召回优先可能增加冗余内容，尚未证明适用于所有网页，完整性仍为 `not_verified`。
+
+`read_saved_webpage` 从 0 开始按字符位置读取，默认最多返回 4000 字符，上限 10000；继续读取使用返回的 `next_offset`。不指定格式时使用快照默认格式，新的 HTML 快照为 Markdown；纯文本页面和旧版快照为 text。传入 `content_format="text"` 核对措辞。`available_formats` 给出各格式的字符总数，切换格式时须重新定位，不能混用 offset。旧快照只有 text，请求不存在的格式返回 `unsupported_format`。
+
+`has_more=false` 表示到达所选格式的快照末尾，`range_complete=true` 表示本次范围覆盖整个所选格式，两者均不保证原网页提取完整。回读计入工具预算，不调用模型或访问网络；未知 ID、越界、损坏快照返回结构化错误。它只接受文档 ID，不接受任意文件路径。跨越 Markdown 加粗或链接标记的引文需要回读 text 后核对；自动检查仍只忽略空白，不自动删除格式符号或放宽措辞匹配。
+
+目前实现资料回查，并修复了两篇实际样本中已发现的六处列表/表格内容遗漏。SDK Loop 和 Harness 已加入累计上下文自动压缩，原 Python 手写 Loop 暂未加入；两版均没有完整会话恢复。当前原文指工具提取的文本，不是原始 HTML。快照会保留在本地，删除文件后相应 ID 无法回读；可用 `MINIMAL_AGENT_WEBPAGE_STORE_DIR` 指定存储目录。
+
+SDK 每次请求前估算当前输入容量（含指令、工具描述和输出预留），达到 12000 时自动生成工作摘要，目标不超过 8500；这是保守估算，不是模型的精确 token 计数。最新任务和系统/Skill 指令完整保留；程序保留文档 ID、来源、格式及回查区间，模型摘要承接事实、约束和未解决事项。压缩先通知用户，无需确认；压缩请求使用 1024 输出上限，计入原有模型次数和时间预算。已执行工具不重跑，成功后下一轮沿用压缩历史。摘要可能遗漏细节，精确事实仍需快照回查。预算不足、摘要截断或无法缩小输入时明确停止，不提交残缺历史。详见 [压缩实现与验证](reports/context-compaction-validation.md)。
+
+验证“旧上下文移除后回查”，运行：
+
+```sh
+cd vercel_agent
+npm run verify:recall
+```
+
+脚本读取一篇真实博客，关闭原工具进程，在全新上下文中只提供文档 ID 与范围定位，让真实模型回查原文；随后验证不存在的 ID。会产生 DeepSeek 用量，结果写入 `reports/webpage-recall-validation.json`。这是人为精简工作记录的验证，不是自动压缩实现。平时也可通过 `npm run harness -- webpage-reader "回查 document_id <实际ID>，回答我的问题……"` 使用已保存资料；将占位符替换成首次读取实际返回的 ID。
 
 图片输入支持公开 HTTP(S) 图片 URL，或项目 `images/` 目录里的本地 PNG、JPEG、WEBP、GIF。远程图片先下载并检查，再转为 Base64 发给模型；最多 8 MiB、2000 万像素。目录外路径不读取。默认样例 `images/demo-chart.png` 是合成测试图，标注 2024=120、2025=150，预期增长 25%。它不代表真实业务数据。重新生成：
 
@@ -79,12 +118,19 @@ python examples/create_demo_image.py
 
 ## 阅读代码
 
+已加入 `obsidian-blog-reader` Skill，把已有阅读文件或新博客分析存入独立 Obsidian vault。Skill 负责读取、简化、启发和保存流程；`save_obsidian_blog` 负责实际写文件并回读。默认目录为 `~/Documents/Obsidian/Agent 博客阅读`，可通过 `MINIMAL_AGENT_OBSIDIAN_VAULT` 指定绝对路径。不会覆盖已有笔记；来源取自真实快照，引文须出现在本轮实际读取内容中。
+
+在 `vercel_agent` 中运行 `npm run harness -- obsidian-blog-reader "回查 document_id <实际ID>，简化分析并保存到 Obsidian"`。每次任务一篇，多篇逐篇运行；此 Skill 的 Harness 在工具返回真实保存并回读的收据后结束，无需再请求模型口头确认，语义验收仍为 `needs_review`。`npm run verify:obsidian` 随机从三家厂商各选一篇，真实采集后交给 Skill 分析快照，再检查 vault 中的实际文件，产生模型用量。详见 [实现与验证](reports/obsidian-skill-validation.md)。
+
+预算验收：在 `vercel_agent` 中运行 `npm run verify:budget -- 2`，比较当前配置的 2 倍与 3 倍上限，每任务重复两次；运行 `npm run verify:budget -- 2 - roomy` 使用相同任务、延后压缩的对照配置。测试三篇论文、一篇博客、六步计算和工具错误恢复，实际请求模型并产生用量。输出目录独立，记录全部成功和失败；`--review-only <实验目录>` 可离线复核。默认交互入口保持原配置，测试配置只作用于本次运行。[预算实验结果与限制](reports/budget-comparison-validation.md)。
+
 ```text
 agent.py               对话入口、Agent Loop、失败回滚
 runtime.py             每轮预算、模型用量和步骤记录
 tools.py              Tool 定义、参数模型、注册表、统一执行
 tool_library/
    network.py          网页搜索和读取
+   webpage_store.py    提取原文快照、按 ID 和范围回查
    calculator.py       计算
    vision.py           图片校验和视觉模型调用
    errors.py           工具错误

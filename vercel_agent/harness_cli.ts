@@ -2,6 +2,7 @@ import { MinimalHarness } from './harness.js';
 import type { Configuration } from './agent.js';
 import { PythonBridge, loadLocalEnv, redact } from './bridge.js';
 import { listSkills } from './skills.js';
+import { harnessEnvironment, harnessConfiguration } from './person_profile.js';
 
 async function main() {
   const args = process.argv.slice(2);
@@ -15,10 +16,12 @@ async function main() {
   if (!task) throw new Error('请提供任务内容');
   loadLocalEnv();
   if (!process.env.DEEPSEEK_API_KEY) throw new Error('请先在项目 .env 填入 DEEPSEEK_API_KEY');
-  const bridge = new PythonBridge();
+  const bridge = new PythonBridge(harnessEnvironment(skill));
   try {
-    const config = await bridge.request<Configuration>('describe');
-    const { directory, record } = await new MinimalHarness(bridge, config).run({ skill, task });
+    const config = harnessConfiguration(await bridge.request<Configuration>('describe'), skill);
+    const { directory, record } = await new MinimalHarness(bridge, config).run({ skill, task }, {
+      onNotice: notice => console.log(redact(notice)),
+    });
     console.log(redact(record.result?.answer ?? `运行未完成：${record.result?.error ?? record.harness_error}`));
     console.log(`\n运行状态：${record.runtime_status}；任务验收：${record.task_verdict}`);
     for (const item of record.automatic_checks?.items ?? []) {

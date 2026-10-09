@@ -13,12 +13,19 @@ from PIL import Image
 import agent
 import tools
 from runtime import BudgetExceeded, RunContext
-from tool_library import network, vision
+from tool_library import network, vision, webpage_store
 from tool_library.errors import ToolError
 from test_agent import response
 
 
 class ToolLibraryTests(unittest.TestCase):
+    def setUp(self):
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        replacement = patch.object(webpage_store, 'SNAPSHOT_DIR', Path(directory.name))
+        replacement.start()
+        self.addCleanup(replacement.stop)
+
     def call(self, name, arguments, **kwargs):
         return json.loads(tools.execute_tool(name, json.dumps(arguments), **kwargs))
 
@@ -42,6 +49,7 @@ class ToolLibraryTests(unittest.TestCase):
         self.assertEqual(self.call("web_search", {"query": "   "})["error"]["code"], "invalid_arguments")
         self.assertEqual(self.call("web_search", {"query": "python", "max_results": 6})["error"]["code"], "invalid_arguments")
 
+    @patch.object(network, "SEARCH_PROVIDERS", ("duckduckgo", "yahoo"))
     def test_search_backend_mapping_and_safe_failure(self):
         search = Mock()
         search.text.return_value = [{"title": "Title", "href": "https://example.com/", "body": "Snippet"}]

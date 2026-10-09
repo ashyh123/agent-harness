@@ -1,0 +1,236 @@
+{
+  "date": "2026-10-09",
+  "scope": "manual task routing: existing Harness and Codex CLI, independent workspaces",
+  "typecheck": "passed",
+  "tests": {
+    "passed": 79,
+    "failed": 0,
+    "new_router_tests": 9
+  },
+  "diff_check": "passed",
+  "live_runs": [
+    {
+      "case": "codex-files",
+      "agent": "codex",
+      "directory": "/Users/ashyh666/Documents/Agent-Runs/codex/2026-10-09/9bcce7c8-5b05-4b9b-94be-a94b9e04f165",
+      "workspace": "/Users/ashyh666/Documents/Agent-Runs/codex/2026-10-09/9bcce7c8-5b05-4b9b-94be-a94b9e04f165/workspace",
+      "status": "completed",
+      "task_verdict": "needs_review",
+      "error": null,
+      "usage": {
+        "input_tokens": 36107,
+        "cached_input_tokens": 30848,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 479,
+        "reasoning_output_tokens": 0
+      },
+      "file_verification": [
+        {
+          "path": "report.md",
+          "bytes_match": true,
+          "sha256_match": true
+        },
+        {
+          "path": "result.json",
+          "bytes_match": true,
+          "sha256_match": true
+        }
+      ],
+      "acceptance": {
+        "passed": true,
+        "kind": "deterministic calculation and actual files",
+        "result": 56877
+      }
+    },
+    {
+      "case": "harness-calculation",
+      "agent": "harness",
+      "directory": "/Users/ashyh666/Documents/Agent-Runs/harness/2026-10-09/deffb285-03eb-4724-abfc-f26b3e0bb186",
+      "workspace": "/Users/ashyh666/Documents/Agent-Runs/harness/2026-10-09/deffb285-03eb-4724-abfc-f26b3e0bb186/workspace",
+      "status": "completed",
+      "task_verdict": "needs_review",
+      "error": null,
+      "usage": {
+        "model_requests": 3,
+        "tool_calls": 2,
+        "total_tokens": 11110
+      },
+      "file_verification": [
+        {
+          "path": "harness/calculation-audit-ull85P/answer.md",
+          "bytes_match": true,
+          "sha256_match": true
+        },
+        {
+          "path": "harness/calculation-audit-ull85P/run.json",
+          "bytes_match": true,
+          "sha256_match": true
+        },
+        {
+          "path": "result.md",
+          "bytes_match": true,
+          "sha256_match": true
+        }
+      ],
+      "tools": [
+        "calculate",
+        "calculate"
+      ],
+      "native_checks": null,
+      "acceptance": {
+        "passed": true,
+        "kind": "actual tool results and answer",
+        "tool_values": [
+          56088,
+          56877
+        ]
+      }
+    },
+    {
+      "case": "long-blog-budget-stop",
+      "agent": "harness",
+      "directory": "/Users/ashyh666/Documents/Agent-Runs/harness/2026-10-09/9faccdbb-9062-453f-b2e8-ac94a9d69145",
+      "workspace": "/Users/ashyh666/Documents/Agent-Runs/harness/2026-10-09/9faccdbb-9062-453f-b2e8-ac94a9d69145/workspace",
+      "status": "failed",
+      "task_verdict": "not_completed",
+      "error": "外层模型预算不足以完成上下文压缩并继续任务",
+      "usage": {
+        "model_requests": 4,
+        "tool_calls": 3,
+        "total_tokens": 16865
+      },
+      "file_verification": [
+        {
+          "path": "harness/obsidian-blog-reader-ft0RMA/answer.md",
+          "bytes_match": true,
+          "sha256_match": true
+        },
+        {
+          "path": "harness/obsidian-blog-reader-ft0RMA/run.json",
+          "bytes_match": true,
+          "sha256_match": true
+        },
+        {
+          "path": "result.md",
+          "bytes_match": true,
+          "sha256_match": true
+        },
+        {
+          "path": "webpage-snapshots/cae3b026fed372bb3b89455be82d5397870a945356dd6aa2f14565a120a008cf.json",
+          "bytes_match": true,
+          "sha256_match": true
+        }
+      ],
+      "tools": [
+        "read_webpage",
+        "read_saved_webpage",
+        "read_saved_webpage"
+      ],
+      "native_checks": null,
+      "acceptance": {
+        "passed": true,
+        "kind": "failure recorded honestly, partial source preserved; blog task unfinished"
+      }
+    },
+    {
+      "case": "short-blog-saved",
+      "agent": "harness",
+      "directory": "/Users/ashyh666/Documents/Agent-Runs/harness/2026-10-09/8168ef9f-74a0-4898-837e-6c40a1e64031",
+      "workspace": "/Users/ashyh666/Documents/Agent-Runs/harness/2026-10-09/8168ef9f-74a0-4898-837e-6c40a1e64031/workspace",
+      "status": "completed",
+      "task_verdict": "needs_review",
+      "error": null,
+      "usage": {
+        "model_requests": 2,
+        "tool_calls": 2,
+        "total_tokens": 9620
+      },
+      "file_verification": [
+        {
+          "path": "harness/obsidian-blog-reader-gSt0qM/answer.md",
+          "bytes_match": true,
+          "sha256_match": true
+        },
+        {
+          "path": "harness/obsidian-blog-reader-gSt0qM/run.json",
+          "bytes_match": true,
+          "sha256_match": true
+        },
+        {
+          "path": "obsidian/.obsidian/app.json",
+          "bytes_match": true,
+          "sha256_match": true
+        },
+        {
+          "path": "obsidian/提取原文/8d34ee6594cdac2ff99d497a30c0191c3d8f580f0a95c1410e3e0e5fdac53782.md",
+          "bytes_match": true,
+          "sha256_match": true
+        },
+        {
+          "path": "obsidian/阅读笔记/The next evolution of the Agents SDK - OpenAI--74fb2c941456.md",
+          "bytes_match": true,
+          "sha256_match": true
+        },
+        {
+          "path": "obsidian/首页.md",
+          "bytes_match": true,
+          "sha256_match": true
+        },
+        {
+          "path": "result.md",
+          "bytes_match": true,
+          "sha256_match": true
+        },
+        {
+          "path": "webpage-snapshots/8d34ee6594cdac2ff99d497a30c0191c3d8f580f0a95c1410e3e0e5fdac53782.json",
+          "bytes_match": true,
+          "sha256_match": true
+        }
+      ],
+      "tools": [
+        "read_webpage",
+        "save_obsidian_blog"
+      ],
+      "native_checks": {
+        "passed": true,
+        "items": [
+          {
+            "name": "read_succeeded",
+            "passed": true,
+            "detail": "实际正文/快照读取 1 次"
+          },
+          {
+            "name": "note_saved_and_verified",
+            "passed": true,
+            "detail": "工具完成写入并回读核验 1 次"
+          },
+          {
+            "name": "summary_is_shorter",
+            "passed": true,
+            "detail": "检查简化内容字符数小于提取原文，语义保真另行验收"
+          },
+          {
+            "name": "reports_real_path",
+            "passed": true,
+            "detail": "最终回答应包含工具返回的真实笔记路径"
+          }
+        ],
+        "quotes": [],
+        "scope": "工具内部核验来源、逐字引文与文件回读；自动检查核对实际保存与简化长度，不能证明概括和启发的语义正确。"
+      },
+      "acceptance": {
+        "passed": true,
+        "kind": "read, shorter summary, actual note, matching quote and file readback; semantic review pending",
+        "note_path": "/Users/ashyh666/Documents/Agent-Runs/harness/2026-10-09/8168ef9f-74a0-4898-837e-6c40a1e64031/workspace/obsidian/阅读笔记/The next evolution of the Agents SDK - OpenAI--74fb2c941456.md",
+        "summary_chars": 401,
+        "source_chars": 6065,
+        "style_note": "summary exceeds Skill suggestion of 100–180 Chinese characters (not a hard tool limit)"
+      }
+    }
+  ],
+  "execution_counts": {
+    "completed": 3,
+    "failed": 1
+  },
+  "semantic_status": "deterministic arithmetic accepted; general tasks remain needs_review; long blog unfinished"
+}

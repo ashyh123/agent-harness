@@ -1,6 +1,10 @@
 # 最薄 Harness：给现有 Loop 一个任务运行外壳
 
-这个入口将“选择流程、执行任务、留下可验收结果”串起来。使用原来的 Vercel SDK Loop、DeepSeek 和四个 Python 工具；新增代码没有安装依赖。
+这个入口将“选择流程、执行任务、留下可验收结果”串起来。使用原来的 Vercel SDK Loop、DeepSeek 和共享 Python 工具库（当前八个工具）。Harness 自身没有额外依赖；工具依赖由根目录 requirements.txt 管理。
+
+希望通过同一个入口给 Harness 或 Codex CLI 发布任务时，见 [统一任务入口](ROUTER.md)。路由器负责执行端选择、任务目录和文件收录，Harness 仍负责自己的 Skill 与模型工具循环。
+
+新增的 [person-agent 流程](PERSON_AGENT.md) 在原循环中启用委派 Codex 和回读产物两个工具；调用 `npm run person -- "任务"`，由 DeepSeek 决定委派参数并审阅返回的文件。
 
 ## 先跑起来
 
@@ -35,7 +39,9 @@ reports/harness/<skill名称>-<随机后缀>/
 | 自动检查 | `checks.ts` | 按 Skill 名称登记的确定性检查；当前只有 `webpage-reader` |
 | 工作流程 | 根目录 `skills/*/SKILL.md` | 描述步骤、输出格式及人工验收要求 |
 | 模型与工具循环 | 已有 `agent.ts` | SDK 调度模型与工具，应用层限制预算并处理失败 |
-| 工具执行 | 已有 `bridge.ts`、`tool_bridge.py`、`tools.py` | 复用 Python 注册表、参数校验与四个工具 |
+| 工具执行 | 已有 `bridge.ts`、`tool_bridge.py`、`tools.py` | 复用 Python 注册表、参数校验与工具库 |
+| 原文回查 | `tool_library/webpage_store.py` | 在上下文外保存提取文本；按文档 ID 和字符位置回读 |
+| 累计上下文压缩 | `context.ts`、`agent.ts` 的 `prepareStep` | 请求前检查容量，生成工作摘要并保留来源索引；压缩请求计入共享预算 |
 
 ## 一次任务怎样运作
 
@@ -58,7 +64,13 @@ flowchart TD
 
 Harness 不替模型决定工具顺序。Skill 描述预期流程，模型仍可能选错、跳过步骤或回答错误；硬性预算与参数检查继续由代码执行。
 
-两个 Skill 都收到同一套四个工具。更换 Skill 改变工作流程和输出要求；它不会新增模型原本没有的操作能力，也不改变工具参数。
+`obsidian-blog-reader` 每次处理一篇，收到现有快照 ID 时优先回查，不重下网页。它调用新增的 `save_obsidian_blog` 保存简化内容、Agent 优化启发、短引文与来源，在专属 vault 同时留提取原文。工具核验本轮确实读取此文档、引文存在、写入后字节一致，并返回实际路径和 hash；不接受任意输出路径，不覆盖已有版本。默认 vault 为 `~/Documents/Obsidian/Agent 博客阅读`，可用 `MINIMAL_AGENT_OBSIDIAN_VAULT` 指定绝对路径。
+
+此 Skill 使用单篇工具产物作为运行终点：保存并回读成功后，Harness 通过 Loop 的可选 `toolCompletion` 返回宿主生成的收据，不再消耗模型请求确认。通用 Loop 和其他 Skill 未指定此策略，仍等待模型最终回答。一个任务含多个 URL 时拒绝执行，调用者逐篇运行，避免只保存第一篇却声称全部完成。自动检查核对读取、真实保存、简化长度和返回路径，语义准确性仍待人工验收。运行 `npm run verify:obsidian` 会随机采集三家各一篇并分析文件，结果存到独立的 `reports/obsidian-runs/`。
+
+新增较长 Skill 后，压缩器还会按指令与来源索引占用计算摘要剩余空间，动态限制字数和生成上限（最多 1024 tokens），避免固定长摘要超过 6500 的目标容量。
+
+所有 Skill 都收到同一套工具。更换 Skill 改变工作流程和输出要求；它不会新增模型原本没有的操作能力，也不改变工具参数。
 
 ## 为什么先显式选 Skill
 
@@ -66,7 +78,11 @@ Harness 不替模型决定工具顺序。Skill 描述预期流程，模型仍可
 
 这让第一次实现可以直接检查“同一 Loop 和工具，换流程能否执行另一类任务”。自动选择可在需要时再加。此处使用本地、由开发者维护的 Skill；下载陌生 Skill 后直接运行不在当前流程里。
 
-每个任务从新消息列表开始。跨任务记忆、多轮澄清及会话恢复尚未实现；资料不足时，本次答案说明缺口，你补充任务后重新执行。
+每个任务从新消息列表开始。网页提取原文现在可以凭 document_id 跨任务回查；完整对话记忆、多轮澄清及会话恢复尚未实现。新任务仍使用新预算，没有恢复之前运行的模型状态。资料不足时，本次答案说明缺口，你补充任务后重新执行。
+
+新 HTML 快照同时保存 Markdown 与 text。模型默认阅读 Markdown；引文跨越加粗或链接格式时，Skill 要求通过 `read_saved_webpage(content_format="text")` 回查原文措辞。两个格式分别分页，字符位置不能混用。自动检查只核对本轮实际返回的资料，不直接读取快照全文来批准未读部分的引文；引文匹配仍只忽略空白。
+
+Harness 沿用 Loop 的自动上下文压缩：累计输入估算达到 12000 时通知用户并生成摘要，目标不超过 8500。Skill 和当前任务保留，历史对话、已完成工具结果由摘要与来源索引承接；必要时从网页快照补读，无须强制读完全文。压缩计入本轮原预算，不能借压缩重置次数。运行记录保留完整工具返回和压缩统计，检查器不以摘要代替原文。容量与失败策略详见 [SDK 文档](README.md)。
 
 ## 运行结束和任务验收分开记录
 
@@ -83,7 +99,7 @@ Harness 不替模型决定工具顺序。Skill 描述预期流程，模型仍可
 
 | 检查 | 通过条件 |
 | --- | --- |
-| `read_succeeded` | 至少一次 `read_webpage` 成功返回正文 |
+| `read_succeeded` | 至少一次 `read_webpage` 或 `read_saved_webpage` 成功返回提取原文 |
 | `quotes_verbatim` | 第一张表格存在“证据”列；每个数据行至少一段引文，且全部逐字出现在工具返回的正文或补充脚注中。只忽略空白，大小写与标点必须一致 |
 | `cites_source_url` | 答案包含工具实际返回的 URL |
 

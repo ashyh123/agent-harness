@@ -14,9 +14,9 @@ export class PythonBridge {
   private sequence = 0;
   private pending = new Map<number, { resolve: (value: any) => void; reject: (error: Error) => void }>();
 
-  constructor(env: NodeJS.ProcessEnv = process.env) {
+  constructor(env: NodeJS.ProcessEnv = process.env, cwd = ROOT) {
     this.child = spawn(join(ROOT, '.venv/bin/python'), ['-u', join(ROOT, 'vercel_agent/tool_bridge.py')], {
-      cwd: ROOT, env, stdio: ['pipe', 'pipe', 'pipe'],
+      cwd, env, stdio: ['pipe', 'pipe', 'pipe'],
     });
     const rejectAll = () => {
       for (const request of this.pending.values()) request.reject(new BridgeError('bridge_closed', 'Python 工具桥接已结束'));

@@ -16,6 +16,13 @@ class RunContext:
     model_requests: int = 0
     tool_calls: int = 0
     events: list = field(default_factory=list)
+    unavailable_search_providers: dict[str, str] = field(default_factory=dict)
+    # JSON/CSV 仅保存在本轮内存中；不进入 trace，也不写入网页快照。
+    data_documents: dict = field(default_factory=dict)
+    # 子Agent的文件只按本轮收到的真实收据访问；重复委派不重复启动CLI。
+    delegated_tasks: dict = field(default_factory=dict)
+    delegation_key: str | None = None
+    delegation_receipt: dict | None = None
     started_at: float = field(default_factory=time.monotonic)
 
     def remaining_seconds(self):

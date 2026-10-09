@@ -11,6 +11,27 @@ const answer = (evidence: string[], extra = `\n\n来源：${url}`) =>
   + evidence.map((cell, index) => `| 问题${index + 1} | 讲解 | ${cell} |`).join('\n') + extra;
 const item = (report: ReturnType<typeof checkWebpageReader>, name: string) => report.items.find(entry => entry.name === name)!;
 
+test('回查原文也参与引文验收；不能使用未实际回读的其他范围', () => {
+  const events = [{ type: 'tool', name: 'read_saved_webpage', result: {
+    url, document_id: 'a'.repeat(64), content: 'Times are simulated estimates.', offset: 11000,
+  } }];
+  assert.equal(checkWebpageReader(answer(['`Times are simulated estimates.`']), events).passed, true);
+  assert.equal(checkWebpageReader(answer(['`Our first partner is Ironclad.`']), events).passed, false);
+});
+
+test('不放宽引文匹配：Markdown 的跨格式引文需实际回读 text，改写仍拒绝', () => {
+  const markdown = [{ type: 'tool', name: 'read_webpage', result: {
+    url, content: 'The **outcome** is the final state.', content_format: 'markdown',
+  } }];
+  const quote = answer(['`The outcome is the final state.`']);
+  assert.equal(checkWebpageReader(quote, markdown).passed, false);
+  const text = { type: 'tool', name: 'read_saved_webpage', result: {
+    url, content: 'The outcome is the final state.', content_format: 'text',
+  } };
+  assert.equal(checkWebpageReader(quote, [...markdown, text]).passed, true);
+  assert.equal(checkWebpageReader(answer(['`The outcome is a final state.`']), [...markdown, text]).passed, false);
+});
+
 test('逐字引文、正文外脚注与来源齐全时通过；说明文字里的反引号不当作引文', () => {
   const report = checkWebpageReader(answer(['`Our first partner is Ironclad.`', '`Times are  simulated\testimates.`']), page(source));
   assert.equal(report.passed, true);

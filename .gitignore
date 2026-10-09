@@ -11,3 +11,9 @@ reports/module-6-3-browser-source.json
 node_modules/
 reports/vercel-last-run.json
 reports/harness/
+reports/webpage-snapshots/
+reports/search-reliability-runs/
+reports/context-compaction-runs/
+reports/context-strategy-runs/
+reports/obsidian-runs/
+reports/budget-runs/
