@@ -1,5 +1,7 @@
 # LangGraph 任务阶段恢复验证
 
+> 历史实验记录：对应的一次性对照脚本已清理，文中旧运行命令不再是可用入口。当前回归验证使用 `npm test`；当前路由对照使用 `python3 vercel_agent/verify_hybrid_repeated.py --exclusive`（仓库根目录，真实付费调用）。
+
 日期：2026-10-10。本地 origin 为 `https://github.com/ashyh123/agent-harness.git`，起点 HEAD `06de7ca9d9d3be9e2fee0dd7a6f3389e21349679`。用户原有根 README 改动与 docs 文件保留，没有修改它们。没有提交、推送或部署。初轮验证为离线测试；随后用户明确授权“验证付费模型”，已完成下文真实模型验证。
 
 ## 实现与取舍

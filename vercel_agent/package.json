@@ -25,9 +25,7 @@
     "verify:diverse": "tsx verify_diverse.ts",
     "test": "tsx --test tests/*.test.ts",
     "typecheck": "tsc --noEmit",
-    "langgraph": "node --import tsx langgraph_cli.ts",
-    "verify:langgraph": "node --import tsx verify_langgraph.ts",
-    "verify:langgraph:real": "node --import tsx verify_langgraph_real.ts"
+    "langgraph": "node --import tsx langgraph_cli.ts"
   },
   "dependencies": {
     "@ai-sdk/deepseek": "3.0.61",

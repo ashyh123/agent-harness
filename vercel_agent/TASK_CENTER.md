@@ -114,3 +114,21 @@ flowchart TD
 6. 原agent.ts：SDK仍处理模型和工具的循环。
 
 离线和真实验收见 [任务中心验收](../reports/task-center-validation.md)。
+
+### Jev 分类实验
+
+`MINIMAL_AGENT_ROUTING_CLASSIFIER=jev npm run person -- "任务"` 启用提交后的能力／复杂度分类。主 Agent 仍负责判断资料是否足够、拆解、提交参数、指定执行端以及产物审阅；Jev 只覆盖 `capability` 与 `complexity`。接口超时或返回非法枚举时保留主 Agent 原值，同一完整提交参数复用分类结果。每次分类用量写入中心目录的 `jev-classifications.jsonl`。
+
+此实现保留主 Agent 的原分类作为回退，因此会增加一个分类请求，不能假定必然节省成本。分类上下文已补充外壳自动保存 result.md 与现有工具能力：仅保存最终回答不算 coding，额外文件和显式编程仍算 coding。该能力摘要需随工具库同步维护。默认入口保持原方案，开关用于实验。新任务完整流程对照可从仓库根目录运行 `python3 vercel_agent/verify_hybrid_repeated.py`，会调用真实付费 API 与 Codex，结果写到被 Git 忽略的独立目录。
+
+重复对照：`python3 vercel_agent/verify_hybrid_repeated.py`，四项新任务各三轮、两组交替，共24条真实流程；清单和验收事实在首次调用前保存。
+
+[三轮上下文修复对照报告](../reports/jev-context-validation.md)：本批两组均12/12完成，Jev未显示整体效率收益。
+
+### Jev 独占分类实验
+
+`MINIMAL_AGENT_ROUTING_CLASSIFIER=jev-exclusive npm run person -- "任务"` 从主模型的提交 schema 中移除 capability/complexity，协调 Skill 也不再要求主模型推断分类或推荐执行端。主模型提交目标、验收、用户指定的 route；Jev 填入两个分类字段后才进入原路由器。结果回读与审阅继续由主模型执行。Jev 无法返回有效分类时拒绝提交，不回退为主模型猜测；原 `jev` 模式仍可保留原分类作为回退。
+
+完整重复对照：从仓库根目录运行 `python3 vercel_agent/verify_hybrid_repeated.py --exclusive`（真实用量）。这只移除分类职责，提交与审阅仍需主模型请求，不能预先宣称省下整次推理调用。
+
+当前版本按用户选择默认启用 `jev-exclusive`（从 `npm run person` 启动时）。缺少 TypeSafe key 会在启动时提示，不静默切回 DeepSeek 分类。`baseline` 可显式恢复原模式；上文及报告中的“未切换默认”描述为实验结束时的历史状态。

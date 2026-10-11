@@ -205,6 +205,8 @@ npm run typecheck
 
 ## 代码导航
 
+Jev 与 DeepSeek 的当前对照见[独占分类报告](reports/jev-exclusive-validation.md)。从仓库根目录运行 `python3 vercel_agent/verify_hybrid_repeated.py --exclusive` 可新建三轮对照；需要配置 API key 和本机 Codex，会产生真实用量。旧的单轮分类实验入口已移除，历史报告保留。
+
 | 位置 | 阅读重点 |
 | --- | --- |
 | [agent_config.py](agent_config.py)、[runtime.py](runtime.py) | 原提示词和默认预算、工具内模型用量与预算计数 |
@@ -233,3 +235,5 @@ npm run typecheck
 - [Harness 与 Skill 的运行方式](vercel_agent/HARNESS.md)
 - [任务中心](vercel_agent/TASK_CENTER.md) · [手动路由](vercel_agent/ROUTER.md)
 - [手写阶段总结](LEARNING_SUMMARY.md) · [SDK/Harness 阶段总结](SDK_HARNESS_SUMMARY.md)
+
+任务中心当前默认采用 **Jev 独占能力／复杂度分类**，DeepSeek 负责提交判断与结果审阅。需要配置 `TYPESAFE_API_KEY` 和 `DEEPSEEK_API_KEY`；可显式设置 `MINIMAL_AGENT_ROUTING_CLASSIFIER=baseline` 回到原方案。采用此版本不代表实验已证明降本，见[最新对照报告](reports/jev-exclusive-validation.md)。

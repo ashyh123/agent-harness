@@ -1,5 +1,7 @@
 # LangGraph 直接执行模型与工具：真实任务对照
 
+> 历史实验记录：对应的一次性对照脚本已清理，文中旧运行命令不再是可用入口。当前回归验证使用 `npm test`；当前路由对照使用 `python3 vercel_agent/verify_hybrid_repeated.py --exclusive`（仓库根目录，真实付费调用）。
+
 2026-10-10，本机真实 DeepSeek API 共 24 次运行。**两组严格验收都为 6/12；未证明 LangGraph 提升任务完成率或效率，保留原 Vercel 循环为默认。** LangGraph 总 token 多 8.68%，平均耗时多 1.85%。
 
 ## 这次实际替换了什么

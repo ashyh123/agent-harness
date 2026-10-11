@@ -13,7 +13,7 @@ export class TaskCenterServer {
   private temporary = '';
   private server?: Server;
   private connections = new Set<Socket>();
-  constructor(private center: TaskCenter) {}
+  constructor(private center: TaskCenter, private classify?: (task: Submission) => Promise<Submission>) {}
   async start() {
     this.temporary = await mkdtemp(join(tmpdir(), 'task-center-'));
     await chmod(this.temporary, 0o700);
@@ -55,13 +55,17 @@ export class TaskCenterServer {
   private dispatch(op: string, args: any) {
     if (!args || typeof args !== 'object' || Array.isArray(args)) throw new Error('IPC参数无效');
     switch (op) {
-      case 'submit_tasks': return this.center.submit(args.tasks as Submission[]);
+      case 'submit_tasks': return this.submit(args.tasks);
       case 'get_task_updates': return this.center.updates(args.cursor ?? 0, args.limit ?? 10, args.task_id);
       case 'read_task_artifact': return this.center.read(args.task_id, args.attempt_id, args.path, args.offset ?? 0, args.limit ?? 3000);
       case 'review_task': return this.center.review(args.task_id, args.attempt_id, args.passed, args.reason, args.evidence ?? []);
       case 'cancel_task': return this.center.cancel(args.task_id);
       default: throw new Error('任务中心操作未注册');
     }
+  }
+  private async submit(tasks: Submission[]) {
+    if (!Array.isArray(tasks)) throw new Error('tasks must be an array');
+    return this.center.submit(this.classify ? await Promise.all(tasks.map(task => this.classify!(task))) : tasks);
   }
   async close() {
     for (const socket of this.connections) socket.destroy();

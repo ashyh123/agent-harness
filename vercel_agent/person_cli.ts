@@ -1,3 +1,4 @@
+import { jevSubmissionClassifier } from './jev_submission.js';
 import { randomUUID } from 'node:crypto';
 import { appendFile, mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -16,13 +17,18 @@ import { completedTaskPaths, renderCompletedTaskPaths } from './center_presentat
 
 async function main() {
   loadLocalEnv();
+  process.env.MINIMAL_AGENT_ROUTING_CLASSIFIER ??= 'jev-exclusive';
+  if (!['baseline', 'jev', 'jev-exclusive'].includes(process.env.MINIMAL_AGENT_ROUTING_CLASSIFIER)) throw new Error('无效的路由分类模式');
+  if (process.env.MINIMAL_AGENT_ROUTING_CLASSIFIER !== 'baseline' && !process.env.TYPESAFE_API_KEY) throw new Error('请先在项目.env配置TYPESAFE_API_KEY，或显式选择baseline模式');
   if (!process.env.DEEPSEEK_API_KEY) throw new Error('请先在项目.env配置DeepSeek密钥');
   const directory = join(process.env.MINIMAL_AGENT_TASK_ROOT ?? DEFAULT_TASK_ROOT, 'center', taskDate(new Date()), randomUUID());
   const availableCodex = await findCodex().then(() => true, () => false);
   const center = new TaskCenter(directory, new TaskRouter(createTaskAdapters(), join(directory, 'executions')),
     executorProfiles(true, availableCodex));
   await center.initialize();
-  const server = new TaskCenterServer(center);
+  const classifier = ['jev', 'jev-exclusive'].includes(process.env.MINIMAL_AGENT_ROUTING_CLASSIFIER ?? '')
+    ? jevSubmissionClassifier(async record => { await appendFile(join(directory, 'jev-classifications.jsonl'), JSON.stringify(record) + '\n'); }) : undefined;
+  const server = new TaskCenterServer(center, classifier);
   let ipc: Awaited<ReturnType<TaskCenterServer['start']>>;
   try { ipc = await server.start(); } catch (error) { await server.close(); throw error; }
   const bridge = new PythonBridge({ ...harnessEnvironment(COORDINATOR_SKILL), ...ipc, MINIMAL_AGENT_TASK_COORDINATION: '1' });

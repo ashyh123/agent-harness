@@ -178,14 +178,21 @@ class TaskAcceptance(ToolParameters):
     json_checks: list[JsonValueCheck] = Field(default_factory=list, max_length=6)
 
 
-class CenterSubmission(ToolParameters):
+class CenterSubmissionDraft(ToolParameters):
     key: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=80)]
     task: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=2500)]
-    capability: Literal['general', 'web', 'data', 'math', 'image', 'coding']
-    complexity: Literal['simple', 'complex']
     route: str = Field(default='auto', min_length=1, max_length=80)
     timeout_seconds: int = Field(default=360, ge=1, le=600)
     acceptance: TaskAcceptance = Field(default_factory=TaskAcceptance)
+
+
+class CenterSubmission(CenterSubmissionDraft):
+    capability: Literal['general', 'web', 'data', 'math', 'image', 'coding']
+    complexity: Literal['simple', 'complex']
+
+
+class SubmitDraftsParameters(ToolParameters):
+    tasks: list[CenterSubmissionDraft] = Field(min_length=1, max_length=4)
 
 
 class SubmitTasksParameters(ToolParameters):
@@ -269,6 +276,9 @@ CENTER_TOOL_REGISTRY = {
         Tool('cancel_task', '取消本中心已创建的任务，终止运行进程或从队列移除；取消不会自动升级，其他独立任务继续执行。', TaskIdParameters, cancel_task),
     ]
 }
+if os.getenv('MINIMAL_AGENT_ROUTING_CLASSIFIER') == 'jev-exclusive':
+    CENTER_TOOL_REGISTRY['submit_tasks'] = Tool('submit_tasks', '提交1–4项独立任务，包含key、完整目标、验收条件和用户明确指定的route（否则auto）。能力与复杂度由Jev判断，不要提供这两个字段或推测执行端。立即返回任务ID；等待外壳通知后回读产物并审阅；不要反复轮询。', SubmitDraftsParameters, submit_tasks)
+
 if os.getenv('MINIMAL_AGENT_TASK_COORDINATION') == '1':
     TOOL_REGISTRY = dict(CENTER_TOOL_REGISTRY)
 

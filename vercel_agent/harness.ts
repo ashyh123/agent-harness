@@ -48,6 +48,13 @@ export class MinimalHarness {
     fixtures?: Record<string, unknown> } = {}): Promise<{ directory: string; record: HarnessRecord }> {
     if (!input.task.trim()) throw new Error('任务不能为空');
     const skill = await loadSkill(input.skill, this.paths.skills);
+    if (skill.name === 'task-coordinator' && process.env.MINIMAL_AGENT_ROUTING_CLASSIFIER === 'jev-exclusive') {
+      const paragraphs = skill.instructions.split('\n\n');
+      paragraphs[0] = '你是统一任务入口。普通聊天直接回答；用户发布工作时，判断信息是否足够，为互不依赖的任务调用submit_tasks，给唯一key、完整目标和验收条件。有依赖的步骤保持为一项任务。业务由执行端完成。';
+      paragraphs[1] = '能力和复杂度完全由Jev分类服务判断，你不判断、不填写、不在任务正文附加分类建议。route默认auto；仅当用户明确指定执行端才填写对应route。代码根据Jev分类和注册表选择执行端。收到分类失败时如实说明任务未提交，不猜测分类。';
+      paragraphs[2] = paragraphs[2].replace('JSON/代码文件任务可明确给出产物路径，routine执行端不具备任意文件写入能力时应选择coding/advanced。', 'JSON/代码文件任务明确给出用户要求的产物路径。');
+      skill.instructions = paragraphs.join('\n\n').replace('分配理由、完成/失败/取消/待审阅', '实际调度结果、完成/失败/取消/待审阅');
+    }
     if (skill.name === 'task-coordinator' && !this.config.tools.some(tool => tool.name === 'submit_tasks')) {
       throw new Error('task-coordinator需要运行中的任务中心；请用npm run person');
     }

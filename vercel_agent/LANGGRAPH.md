@@ -96,16 +96,13 @@ npm run langgraph -- resume ../reports/langgraph-runs/my-calculation approve
 
 ```sh
 node --import tsx --test tests/langgraph.test.ts
-npm run verify:langgraph
-# 明确的付费模型验证入口，使用已配置的 DeepSeek 账号
-npm run verify:langgraph:real
 npm run typecheck
 npm test
 ```
 
 离线模型响应固定，**真实 Vercel SDK、真实 PythonBridge 和 calculate** 执行；不读取 .env、不调用模型 API。故障测试用独立 Node 进程 `process.exit(73)`，另起进程从 SQLite 恢复，核对只存在一次 Harness 运行、两次模拟模型请求、一次真实工具调用，交付内容无重复。另测原预算失败、拒绝审批、已有验收否决、重复 start、执行结果不确定与禁止副作用 Skill。
 
-对照复用相同 Skill、任务、calculate、配置和输出，正常预算/一请求故意失败档各重复三次，交替两组执行顺序。每次保存独立 Harness 记录和 comparison.json；记录实际执行耗时、工具轨迹、重复调用、模拟 tokens。评测脚本中的自动批准仅用于受控计算实验；真实交互入口仍需显式 approve/reject。成本记为 null，fixture tokens 不是计费证据。评测脚本不是通用算式评测，也不能说明真实模型稳定性。
+旧外层包装对照脚本已移除，以下为历史实验说明，当前回归验证使用上面的测试命令。历史对照复用相同 Skill、任务、calculate、配置和输出，正常预算/一请求故意失败档各重复三次，交替两组执行顺序。每次保存独立 Harness 记录和 comparison.json；记录实际执行耗时、工具轨迹、重复调用、模拟 tokens。评测脚本中的自动批准仅用于受控计算实验；真实交互入口仍需显式 approve/reject。成本记为 null，fixture tokens 不是计费证据。评测脚本不是通用算式评测，也不能说明真实模型稳定性。
 
 结果及简历描述见 [验证报告](../reports/langgraph-validation.md)。原长文 offload-recovery 严格验收仍为 0/4，本任务不改变该结论。
 

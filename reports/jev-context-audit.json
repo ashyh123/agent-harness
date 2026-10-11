@@ -1,0 +1,208 @@
+[
+  {
+    "case": "math",
+    "repeat": 0,
+    "arm": "baseline",
+    "artifact_check": true,
+    "quote": [],
+    "artifact": "/Users/ashyh666/Documents/ChatGPT/hugging face + 最小agent demo/reports/routing-model-runs/hybrid-context-8_fo0x8y/math-0-baseline/center/2026-10-11/582f664f-6c6d-4dfe-a13a-6fba20be44a6/executions/harness/2026-10-11/906b2cbd-8d44-4635-a19b-55337cd87ed8/workspace/result.md"
+  },
+  {
+    "case": "math",
+    "repeat": 0,
+    "arm": "jev",
+    "artifact_check": true,
+    "quote": [],
+    "artifact": "/Users/ashyh666/Documents/ChatGPT/hugging face + 最小agent demo/reports/routing-model-runs/hybrid-context-8_fo0x8y/math-0-jev/center/2026-10-11/4db61416-24ed-4715-92d5-414af94ca4ea/executions/harness/2026-10-11/80ec7f87-bd7d-440f-b74c-ed37ba4aaa5b/workspace/result.md"
+  },
+  {
+    "case": "data",
+    "repeat": 0,
+    "arm": "jev",
+    "artifact_check": true,
+    "quote": [],
+    "artifact": "/Users/ashyh666/Documents/ChatGPT/hugging face + 最小agent demo/reports/routing-model-runs/hybrid-context-8_fo0x8y/data-0-jev/center/2026-10-11/5119fbc7-54a5-4192-b162-ecc76b803216/executions/harness/2026-10-11/95d037e6-b6dd-489f-8b6a-1e10fe8f074c/workspace/result.md"
+  },
+  {
+    "case": "data",
+    "repeat": 0,
+    "arm": "baseline",
+    "artifact_check": true,
+    "quote": [],
+    "artifact": "/Users/ashyh666/Documents/ChatGPT/hugging face + 最小agent demo/reports/routing-model-runs/hybrid-context-8_fo0x8y/data-0-baseline/center/2026-10-11/099be6a6-a87e-463b-b3db-bb340c2ee13b/executions/harness/2026-10-11/c1c0c69f-8763-4fc3-83e9-e4c9e1354692/workspace/result.md"
+  },
+  {
+    "case": "blog",
+    "repeat": 0,
+    "arm": "baseline",
+    "artifact_check": true,
+    "quote": [
+      "Because the session log sits outside the harness, nothing in the harness needs to survive a crash."
+    ],
+    "artifact": "/Users/ashyh666/Documents/ChatGPT/hugging face + 最小agent demo/reports/routing-model-runs/hybrid-context-8_fo0x8y/blog-0-baseline/center/2026-10-11/9fd4f758-85d6-423b-bd37-0770b00c35c0/executions/codex/2026-10-11/f90da658-10c7-4579-a434-2401e79bd20a/workspace/result.md"
+  },
+  {
+    "case": "blog",
+    "repeat": 0,
+    "arm": "jev",
+    "artifact_check": true,
+    "quote": [
+      "Because the session log sits outside the harness, nothing in the harness needs to survive a crash."
+    ],
+    "artifact": "/Users/ashyh666/Documents/ChatGPT/hugging face + 最小agent demo/reports/routing-model-runs/hybrid-context-8_fo0x8y/blog-0-jev/center/2026-10-11/ad24c4f2-9db6-4db5-a4a5-93c925909cce/executions/codex/2026-10-11/68546b4f-63c6-4e1b-9102-e815e83686c8/workspace/result.md"
+  },
+  {
+    "case": "code",
+    "repeat": 0,
+    "arm": "jev",
+    "artifact_check": true,
+    "quote": [],
+    "artifact": "/Users/ashyh666/Documents/ChatGPT/hugging face + 最小agent demo/reports/routing-model-runs/hybrid-context-8_fo0x8y/code-0-jev/center/2026-10-11/78d4006e-e174-47d1-b3aa-e16b54c52a2b/executions/codex/2026-10-11/181d9147-a4d6-433c-bd24-86c9e631497a/workspace/result.md"
+  },
+  {
+    "case": "code",
+    "repeat": 0,
+    "arm": "baseline",
+    "artifact_check": true,
+    "quote": [],
+    "artifact": "/Users/ashyh666/Documents/ChatGPT/hugging face + 最小agent demo/reports/routing-model-runs/hybrid-context-8_fo0x8y/code-0-baseline/center/2026-10-11/bccdfa4d-4615-4e32-98d9-02957ef3d4a3/executions/codex/2026-10-11/2a40103f-0c4f-4aeb-9044-4cef2c061065/workspace/result.md"
+  },
+  {
+    "case": "math",
+    "repeat": 1,
+    "arm": "jev",
+    "artifact_check": true,
+    "quote": [],
+    "artifact": "/Users/ashyh666/Documents/ChatGPT/hugging face + 最小agent demo/reports/routing-model-runs/hybrid-context-8_fo0x8y/math-1-jev/center/2026-10-11/178202e7-97bf-414e-ba54-088e8dea3b77/executions/harness/2026-10-11/ec3f7ea9-1074-4588-b250-2fd5392e3be7/workspace/result.md"
+  },
+  {
+    "case": "math",
+    "repeat": 1,
+    "arm": "baseline",
+    "artifact_check": true,
+    "quote": [],
+    "artifact": "/Users/ashyh666/Documents/ChatGPT/hugging face + 最小agent demo/reports/routing-model-runs/hybrid-context-8_fo0x8y/math-1-baseline/center/2026-10-11/57a183ec-5b45-4e68-a9a6-21f4e87acd67/executions/codex/2026-10-11/d294aeec-2641-4569-903c-a2f0835a2ea1/workspace/result.md"
+  },
+  {
+    "case": "data",
+    "repeat": 1,
+    "arm": "baseline",
+    "artifact_check": true,
+    "quote": [],
+    "artifact": "/Users/ashyh666/Documents/ChatGPT/hugging face + 最小agent demo/reports/routing-model-runs/hybrid-context-8_fo0x8y/data-1-baseline/center/2026-10-11/24c6c3cf-ec79-4207-bfb7-0618e05a4ce1/executions/harness/2026-10-11/d1161e14-1842-4ad7-b33a-7a93d1c4dbb3/workspace/result.md"
+  },
+  {
+    "case": "data",
+    "repeat": 1,
+    "arm": "jev",
+    "artifact_check": true,
+    "quote": [],
+    "artifact": "/Users/ashyh666/Documents/ChatGPT/hugging face + 最小agent demo/reports/routing-model-runs/hybrid-context-8_fo0x8y/data-1-jev/center/2026-10-11/fd2dfc54-016b-4b61-aa77-861455f4d009/executions/harness/2026-10-11/cf10addf-415c-4da3-b714-9416dc78f9a6/workspace/result.md"
+  },
+  {
+    "case": "blog",
+    "repeat": 1,
+    "arm": "jev",
+    "artifact_check": true,
+    "quote": [
+      "Because the session log sits outside the harness",
+      "If Claude decided to retry, a new container could be reinitialized with a standard recipe"
+    ],
+    "artifact": "/Users/ashyh666/Documents/ChatGPT/hugging face + 最小agent demo/reports/routing-model-runs/hybrid-context-8_fo0x8y/blog-1-jev/center/2026-10-11/14ef1914-4b43-490c-bd7f-cd1097c84620/executions/codex/2026-10-11/a6bf149a-d12e-4ca1-a7ee-d4fc7b90ee5e/workspace/result.md"
+  },
+  {
+    "case": "blog",
+    "repeat": 1,
+    "arm": "baseline",
+    "artifact_check": true,
+    "quote": [
+      "Because the session log sits outside the harness, nothing in the harness needs to survive a crash."
+    ],
+    "artifact": "/Users/ashyh666/Documents/ChatGPT/hugging face + 最小agent demo/reports/routing-model-runs/hybrid-context-8_fo0x8y/blog-1-baseline/center/2026-10-11/0b972216-59a7-495f-bec9-bd77d455da79/executions/codex/2026-10-11/b93e161f-6f78-4a1f-b9ec-894f2bb675a0/workspace/result.md"
+  },
+  {
+    "case": "code",
+    "repeat": 1,
+    "arm": "baseline",
+    "artifact_check": true,
+    "quote": [],
+    "artifact": "/Users/ashyh666/Documents/ChatGPT/hugging face + 最小agent demo/reports/routing-model-runs/hybrid-context-8_fo0x8y/code-1-baseline/center/2026-10-11/acdecf49-a2e1-4069-9f2b-ae78eaf8bd6a/executions/codex/2026-10-11/ccc661d5-afd4-4286-bb45-9fb1708bbf39/workspace/result.md"
+  },
+  {
+    "case": "code",
+    "repeat": 1,
+    "arm": "jev",
+    "artifact_check": true,
+    "quote": [],
+    "artifact": "/Users/ashyh666/Documents/ChatGPT/hugging face + 最小agent demo/reports/routing-model-runs/hybrid-context-8_fo0x8y/code-1-jev/center/2026-10-11/846ec76e-e376-428b-b5b7-4c42348b1fdd/executions/codex/2026-10-11/de9768e3-3d40-4bd0-9c12-5730d1e781bf/workspace/result.md"
+  },
+  {
+    "case": "math",
+    "repeat": 2,
+    "arm": "baseline",
+    "artifact_check": true,
+    "quote": [],
+    "artifact": "/Users/ashyh666/Documents/ChatGPT/hugging face + 最小agent demo/reports/routing-model-runs/hybrid-context-8_fo0x8y/math-2-baseline/center/2026-10-11/5425c800-03ef-4ad0-9d06-38fb801273ad/executions/harness/2026-10-11/a01df717-69a1-437a-ae46-96f5a17d712c/workspace/result.md"
+  },
+  {
+    "case": "math",
+    "repeat": 2,
+    "arm": "jev",
+    "artifact_check": true,
+    "quote": [],
+    "artifact": "/Users/ashyh666/Documents/ChatGPT/hugging face + 最小agent demo/reports/routing-model-runs/hybrid-context-8_fo0x8y/math-2-jev/center/2026-10-11/e4f7174b-01b8-43e0-8a6b-ca21bca6507e/executions/harness/2026-10-11/089810b1-4777-497d-a564-cde13522b818/workspace/result.md"
+  },
+  {
+    "case": "data",
+    "repeat": 2,
+    "arm": "jev",
+    "artifact_check": true,
+    "quote": [],
+    "artifact": "/Users/ashyh666/Documents/ChatGPT/hugging face + 最小agent demo/reports/routing-model-runs/hybrid-context-8_fo0x8y/data-2-jev/center/2026-10-11/1bd392a0-77ba-4745-b480-c7cce6580459/executions/codex/2026-10-11/82bfe79a-eb7a-4e09-b093-c4debfa31efd/workspace/result.md"
+  },
+  {
+    "case": "data",
+    "repeat": 2,
+    "arm": "baseline",
+    "artifact_check": true,
+    "quote": [],
+    "artifact": "/Users/ashyh666/Documents/ChatGPT/hugging face + 最小agent demo/reports/routing-model-runs/hybrid-context-8_fo0x8y/data-2-baseline/center/2026-10-11/d2d8a2c8-d263-46d9-8d13-41c647198f73/executions/harness/2026-10-11/f0ae8d89-e9b5-4a5a-9786-5d715abcd3e0/workspace/result.md"
+  },
+  {
+    "case": "blog",
+    "repeat": 2,
+    "arm": "baseline",
+    "artifact_check": true,
+    "quote": [
+      "the session log sits outside the harness",
+      "the harness caught the failure as a tool-call error and passed it back to Claude."
+    ],
+    "artifact": "/Users/ashyh666/Documents/ChatGPT/hugging face + 最小agent demo/reports/routing-model-runs/hybrid-context-8_fo0x8y/blog-2-baseline/center/2026-10-11/cc134a03-cffa-4378-9e97-c598204cb449/executions/codex/2026-10-11/d2a24171-c0dd-4d0f-bd19-3f25fbe8f4cd/workspace/result.md"
+  },
+  {
+    "case": "blog",
+    "repeat": 2,
+    "arm": "jev",
+    "artifact_check": true,
+    "quote": [
+      "Because the session log sits outside the harness, nothing in the harness needs to survive a crash."
+    ],
+    "artifact": "/Users/ashyh666/Documents/ChatGPT/hugging face + 最小agent demo/reports/routing-model-runs/hybrid-context-8_fo0x8y/blog-2-jev/center/2026-10-11/18b09afb-0e9a-496e-bff3-4be76f93bcf0/executions/codex/2026-10-11/aa908251-3bb8-42b2-a3ac-357002cfabf7/workspace/result.md"
+  },
+  {
+    "case": "code",
+    "repeat": 2,
+    "arm": "jev",
+    "artifact_check": true,
+    "quote": [],
+    "artifact": "/Users/ashyh666/Documents/ChatGPT/hugging face + 最小agent demo/reports/routing-model-runs/hybrid-context-8_fo0x8y/code-2-jev/center/2026-10-11/91e1a8b4-9b43-48de-b121-05c9106800ca/executions/codex/2026-10-11/c2b31bf0-a8b9-425b-bbb4-fdfc423ffcd6/workspace/result.md"
+  },
+  {
+    "case": "code",
+    "repeat": 2,
+    "arm": "baseline",
+    "artifact_check": true,
+    "quote": [],
+    "artifact": "/Users/ashyh666/Documents/ChatGPT/hugging face + 最小agent demo/reports/routing-model-runs/hybrid-context-8_fo0x8y/code-2-baseline/center/2026-10-11/74bf72d2-8e85-454e-a303-3dc5cff9f45a/executions/codex/2026-10-11/98edde4d-8118-474c-9c04-5b86f0922937/workspace/result.md"
+  }
+]

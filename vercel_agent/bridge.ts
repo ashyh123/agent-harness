@@ -58,6 +58,9 @@ export function loadLocalEnv() {
 }
 
 export function redact(text: string) {
-  const key = process.env.DEEPSEEK_API_KEY;
-  return key ? text.replaceAll(key, '[REDACTED]') : text;
+  for (const name of ['DEEPSEEK_API_KEY', 'TYPESAFE_API_KEY']) {
+    const key = process.env[name];
+    if (key) text = text.replaceAll(key, '[REDACTED]');
+  }
+  return text;
 }

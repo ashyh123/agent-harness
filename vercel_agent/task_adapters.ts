@@ -9,6 +9,7 @@ import { redactTask, type AgentAdapter } from './task_router.js';
 function executorEnvironment() {
   const env = { ...process.env };
   // 执行端不能递归提交中心任务，也不能取得主Agent的本地IPC凭据。
+  delete env.TYPESAFE_API_KEY;
   delete env.MINIMAL_AGENT_TASK_CENTER_SOCKET;
   delete env.MINIMAL_AGENT_TASK_CENTER_TOKEN;
   delete env.MINIMAL_AGENT_TASK_COORDINATION;
