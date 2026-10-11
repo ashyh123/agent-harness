@@ -1,0 +1,170 @@
+{
+  "date": "2026-10-10",
+  "scope": "existing task-phase wrapper around same VercelLoop",
+  "summary": [
+    {
+      "case": "dependent_growth",
+      "backend": "harness",
+      "accepted": 3,
+      "runs": 3,
+      "tokens_mean": 6927,
+      "tokens_total": 20781,
+      "elapsed_ms_median": 6213,
+      "executor_ms_median": 5775,
+      "model_requests": [
+        5,
+        5,
+        5
+      ],
+      "tool_calls": [
+        7,
+        7,
+        7
+      ]
+    },
+    {
+      "case": "dependent_growth",
+      "backend": "langgraph",
+      "accepted": 3,
+      "runs": 3,
+      "tokens_mean": 6920.333333333333,
+      "tokens_total": 20761,
+      "elapsed_ms_median": 5742,
+      "executor_ms_median": 5495,
+      "model_requests": [
+        5,
+        5,
+        5
+      ],
+      "tool_calls": [
+        7,
+        7,
+        7
+      ]
+    },
+    {
+      "case": "weighted_inventory",
+      "backend": "harness",
+      "accepted": 3,
+      "runs": 3,
+      "tokens_mean": 5571.666666666667,
+      "tokens_total": 16715,
+      "elapsed_ms_median": 4968,
+      "executor_ms_median": 4729,
+      "model_requests": [
+        4,
+        4,
+        4
+      ],
+      "tool_calls": [
+        7,
+        7,
+        7
+      ]
+    },
+    {
+      "case": "weighted_inventory",
+      "backend": "langgraph",
+      "accepted": 3,
+      "runs": 3,
+      "tokens_mean": 5571,
+      "tokens_total": 16713,
+      "elapsed_ms_median": 4821,
+      "executor_ms_median": 4570,
+      "model_requests": [
+        4,
+        4,
+        4
+      ],
+      "tool_calls": [
+        7,
+        7,
+        7
+      ]
+    },
+    {
+      "case": "zero_error_recovery",
+      "backend": "harness",
+      "accepted": 3,
+      "runs": 3,
+      "tokens_mean": 5966,
+      "tokens_total": 17898,
+      "elapsed_ms_median": 5236,
+      "executor_ms_median": 4995,
+      "model_requests": [
+        5,
+        5,
+        5
+      ],
+      "tool_calls": [
+        4,
+        4,
+        4
+      ]
+    },
+    {
+      "case": "zero_error_recovery",
+      "backend": "langgraph",
+      "accepted": 3,
+      "runs": 3,
+      "tokens_mean": 5966,
+      "tokens_total": 17898,
+      "elapsed_ms_median": 5600,
+      "executor_ms_median": 5329,
+      "model_requests": [
+        5,
+        5,
+        5
+      ],
+      "tool_calls": [
+        4,
+        4,
+        4
+      ]
+    },
+    {
+      "case": "budget_boundary",
+      "backend": "harness",
+      "accepted": 0,
+      "runs": 3,
+      "tokens_mean": 5867,
+      "tokens_total": 17601,
+      "elapsed_ms_median": 4991,
+      "executor_ms_median": 4742,
+      "model_requests": [
+        5,
+        5,
+        5
+      ],
+      "tool_calls": [
+        5,
+        5,
+        5
+      ]
+    },
+    {
+      "case": "budget_boundary",
+      "backend": "langgraph",
+      "accepted": 0,
+      "runs": 3,
+      "tokens_mean": 5867,
+      "tokens_total": 17601,
+      "elapsed_ms_median": 5179,
+      "executor_ms_median": 4924,
+      "model_requests": [
+        5,
+        5,
+        5
+      ],
+      "tool_calls": [
+        5,
+        5,
+        5
+      ]
+    }
+  ],
+  "raw_sources": [
+    "reports/langgraph-runs/complex-GlcNuf/comparison.json",
+    "reports/langgraph-runs/complex-ZanUm7/comparison.json"
+  ]
+}

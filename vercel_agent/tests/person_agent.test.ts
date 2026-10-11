@@ -70,7 +70,8 @@ test('真实SDK调用委派工具，经Python和路由器启动假CLI，结果�
     return completion(`已回读子任务产物，事实仍待核实。${receipt.workspace}/obsidian/阅读笔记/blog.md`);
   });
   const { record } = await harness.run({ skill: 'person-agent', task: '交给Codex处理离线样例，再审阅文件' });
-  assert.equal(config.tools.length, 10);
+  assert.equal(config.tools.length, 11);
+  assert.ok(config.tools.some(tool => tool.name === 'search_saved_webpage'));
   assert.equal(config.max_seconds, 360);
   assert.equal(config.context_policy?.trigger_tokens, 24_000);
   assert.equal(config.context_policy?.target_tokens, 16_000);

@@ -1,0 +1,11 @@
+{
+  "document_id": "b80e3f761f217ec84d90776d17080894f97e3012af379415a3bf456eb57eac94",
+  "source_url": "https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents",
+  "questions": [
+    {"id": "initial-size", "question": "初期评测建议从多少任务起步、任务来自哪里？"},
+    {"id": "reliability", "question": "pass^k要求全部k次还是至少一次成功？"},
+    {"id": "booking", "question": "航班预订成功应依据环境的什么状态？"}
+  ],
+  "min_quote_chars": 12,
+  "max_quote_chars": 100
+}

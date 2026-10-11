@@ -40,6 +40,12 @@ function memory(message: ModelMessage): Memory | undefined {
 }
 function evidence(toolName: string, value: any): unknown {
   if (!value || typeof value !== 'object') return value;
+  if (toolName === 'search_saved_webpage') {
+    return { document_id: value.document_id, url: value.url, content_format: value.content_format,
+      query: value.query, total_chars: value.total_chars, error: value.error,
+      matches: value.matches?.map(({offset,end_offset}:any)=>({offset,end_offset})),
+      previews_omitted: true, recall: '命中不是已读证据；按位置用read_saved_webpage回读text。' };
+  }
   if (toolName === 'submit_tasks' || toolName === 'get_task_updates') {
     const detail = value.detail;
     return { tasks: value.tasks, next_cursor: value.next_cursor, has_more: value.has_more,

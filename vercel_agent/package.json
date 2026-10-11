@@ -3,10 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "chat": "tsx cli.ts",
     "harness": "tsx harness_cli.ts",
+    "harness:langgraph": "tsx harness_cli.ts --langgraph",
+    "verify:execution-graph": "node --import tsx verify_execution_graph.ts",
+    "verify:evidence-reading": "node --import tsx verify_evidence_reading.ts",
     "router": "tsx router_cli.ts",
     "person": "tsx person_cli.ts",
     "person:delegate": "tsx router_cli.ts run --agent harness --skill person-agent --timeout 420",
@@ -22,15 +27,20 @@
     "verify:budget": "tsx verify_budget.ts",
     "verify:diverse": "tsx verify_diverse.ts",
     "test": "tsx --test tests/*.test.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "langgraph": "node --import tsx langgraph_cli.ts",
+    "verify:langgraph": "node --import tsx verify_langgraph.ts",
+    "verify:langgraph:real": "node --import tsx verify_langgraph_real.ts"
   },
   "dependencies": {
-    "ai": "7.0.130",
-    "@ai-sdk/deepseek": "3.0.61"
+    "@ai-sdk/deepseek": "3.0.61",
+    "@langchain/langgraph": "1.4.21",
+    "@langchain/langgraph-checkpoint-sqlite": "1.0.4",
+    "ai": "7.0.130"
   },
   "devDependencies": {
+    "@types/node": "22.19.15",
     "tsx": "4.23.15",
-    "typescript": "7.0.2",
-    "@types/node": "22.19.15"
+    "typescript": "7.0.2"
   }
 }

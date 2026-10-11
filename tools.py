@@ -13,7 +13,7 @@ from tool_library.calculator import calculate
 from tool_library.data import read_data, query_data
 from tool_library.errors import ToolError
 from tool_library.network import read_webpage, web_search
-from tool_library.webpage_store import read_saved_webpage
+from tool_library.webpage_store import read_saved_webpage, search_saved_webpage
 from tool_library.obsidian import save_obsidian_blog
 from tool_library.vision import analyze_image
 from tool_library.delegation import delegate_to_codex, read_delegated_file
@@ -87,6 +87,10 @@ class SavedWebpageParameters(ToolParameters):
     limit: int = Field(default=4000, ge=1, le=10000, description="本次最多返回的字符数")
     content_format: Literal["markdown", "text"] | None = Field(default=None,
         description="省略时读取默认格式；Markdown 用于阅读，text 用于核对原文措辞。不同格式的字符位置不同，切换格式从 0 定位")
+
+
+class SearchSavedWebpageParameters(SearchParameters):
+    document_id: str = Field(pattern=r"^[0-9a-f]{64}$")
 
 
 class CalculateParameters(ToolParameters):
@@ -236,6 +240,7 @@ TOOL_REGISTRY = {
         Tool("web_search", "搜索网页，优先使用 Tavily 官方 SDK 的免费无需密钥模式，失败时依次尝试 DuckDuckGo、Yahoo。返回实际 provider、尝试记录、标题、URL 和摘要。摘要不是完整正文，需要阅读时调用 read_webpage。search_unavailable 表示服务失败，本轮不要继续重复搜索或换词重试。", SearchParameters, web_search),
         Tool("read_webpage", "读取公开网页正文与脚注，HTML 默认返回保留结构的 Markdown，同时保存原文文本；返回 document_id 和 available_formats。截断或核对措辞时，用 read_saved_webpage 按 ID 读取。false 不保证整页完整，须关注 completeness 与 coverage_note。", WebpageParameters, read_webpage),
         Tool("read_saved_webpage", "按 document_id 回查网页快照，不联网、不重新下载。默认读取 Markdown（旧快照为 text）；可用 content_format=text 核对不含加粗等格式标记的原文措辞。offset/limit 是所选格式的字符位置，next_offset 用于继续；不同格式位置不能混用。has_more=false 不证明整页提取完整。", SavedWebpageParameters, read_saved_webpage),
+        Tool("search_saved_webpage", "用SQLite FTS5/BM25在指定document_id的完整text快照中搜索关键词，返回排名靠前的片段位置与短预览。query使用原文语言的关键词，可换词或分问题搜索。用read_saved_webpage按text回读命中范围后再引用；无命中不证明全文无答案。", SearchSavedWebpageParameters, search_saved_webpage),
         Tool("calculate", "精确执行两个数的加减乘除。operation 为 add/subtract/multiply/divide；多步计算可连续调用。百分比增长用 (新值-旧值)/旧值*100。", CalculateParameters, calculate),
         Tool("read_data", "解析公开 URL 或内联 text 的 JSON/CSV（二选一），支持 UTF-8/BOM、CSV 引号与换行。返回本轮内存 dataset_id 和有界分页，不写文件。预览过大时返回 structure 和 preview_omitted，仍能按 ID 查询。JSON 可用 json_pointer 选中嵌套数组，columns 选字段，output_format=csv 转为 CSV；CSV 默认转对象数组且保留字符串。继续处理用 query_data，不要重新下载。null/嵌套值转 CSV 明确拒绝有损转换。", ReadDataParameters, read_data),
         Tool("query_data", "查询本轮 read_data 的原始内存数据：JSON Pointer、选列、AND 筛选、排序、分页、JSON/CSV 转换或 count/sum/mean/min/max 全量统计。aggregate_column 指数值列；空值和非数值不当作零。CSV eq/ne 用字符串，数值大小用 gt/ge/lt/le；numeric_sort=true 数值排序。分页不是压缩，不丢源数据；ID 不跨任务有效。", QueryDataParameters, query_data),

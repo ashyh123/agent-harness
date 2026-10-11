@@ -5,8 +5,10 @@ import { PythonBridge, ROOT, redact } from './bridge.js';
 import { SKILL_CHECKS, type CheckReport } from './checks.js';
 import { loadSkill, SKILLS_ROOT, type Skill } from './skills.js';
 import { DEFAULT_CONTEXT_POLICY, type ContextPolicy } from './context.js';
+import type { ReadingContract } from './reading_validation.js';
 
-export interface TaskInput { skill: string; task: string }
+export interface TaskInput { skill: string; task: string; readingContract?: ReadingContract;
+  readingReview?: 'structural' | 'semantic' }
 export interface HarnessRecord {
   input: TaskInput;
   skill: Skill;
@@ -37,7 +39,9 @@ function checkSection(report: CheckReport) {
 export class MinimalHarness {
   constructor(private readonly bridge: PythonBridge, private readonly config: Configuration,
               private readonly paths = { skills: SKILLS_ROOT, runs: join(ROOT, 'reports/harness') },
-              private readonly fetcher: typeof fetch = fetch) {}
+              private readonly fetcher: typeof fetch = fetch,
+              private readonly loopFactory: (bridge: PythonBridge, config: Configuration, fetcher: typeof fetch) => Pick<VercelLoop, 'run'>
+                = (bridge, config, fetcher) => new VercelLoop(bridge, config, fetcher)) {}
 
   async run(input: TaskInput, options: { onNotice?: (notice: string) => void;
     fixtures?: Record<string, unknown> } = {}): Promise<{ directory: string; record: HarnessRecord }> {
@@ -70,12 +74,14 @@ export class MinimalHarness {
     // 请求前先留任务记录；中途被终止时，未写 finished_at 的记录可以识别为未收尾。
     await save();
     try {
-      const loop = new VercelLoop(this.bridge, {
+      const loop = this.loopFactory(this.bridge, {
         ...this.config,
         system_prompt: `${this.config.system_prompt}\n\n当前选定 Skill：${skill.name}\n${skill.instructions}`,
       }, this.fetcher);
       // 每个任务独立上下文；Skill 不写进下一任务的历史。
       record.result = await loop.run([{ role: 'user', content: input.task }], {
+        readingContract: input.readingContract,
+        readingReview: input.readingReview,
         onNotice: options.onNotice,
         fixtures: options.fixtures,
         toolCompletion: skill.name === 'obsidian-blog-reader' ? {

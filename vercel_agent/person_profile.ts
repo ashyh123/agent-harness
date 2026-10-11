@@ -18,7 +18,7 @@ export function harnessConfiguration(config: Configuration, skill: string): Conf
     max_tool_calls: 16, max_seconds: 180, max_output_tokens: 2048,
     context_policy: { ...config.context_policy, trigger_tokens: 40000, target_tokens: 28000 } };
   if (skill === 'task-executor') return { ...config, max_output_tokens: 1024 };
-  // 10个工具的描述与子任务文件索引需要更多空间；不丢弃必须保留的交接资料。
+  // 委派工具的描述与子任务文件索引需要更多空间；不丢弃必须保留的交接资料。
   return skill === PERSON_SKILL ? { ...config, max_seconds: PERSON_MAX_SECONDS,
     context_policy: { ...config.context_policy, trigger_tokens: 24_000, target_tokens: 16_000 } } : config;
 }
