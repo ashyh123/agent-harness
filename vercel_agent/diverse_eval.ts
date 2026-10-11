@@ -1,5 +1,5 @@
 import { parseAnswer, readingChecks, type ReadingCase } from './budget_eval.js';
-import type { RunResult } from './agent.js';
+import type { RunResult } from './execution_runtime.js';
 
 export interface DataCase {
   id: string;

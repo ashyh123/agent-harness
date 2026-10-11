@@ -3,7 +3,7 @@ import { writeFile } from 'node:fs/promises';
 import { join, isAbsolute } from 'node:path';
 import { MinimalHarness } from './harness.js';
 import { PythonBridge, loadLocalEnv, redact } from './bridge.js';
-import type { Configuration } from './agent.js';
+import type { Configuration } from './execution_runtime.js';
 import { SKILLS_ROOT } from './skills.js';
 import { harnessEnvironment, harnessConfiguration } from './person_profile.js';
 

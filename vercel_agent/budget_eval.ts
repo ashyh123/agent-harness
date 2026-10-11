@@ -1,4 +1,4 @@
-import type { Configuration, RunResult } from './agent.js';
+import type { Configuration, RunResult } from './execution_runtime.js';
 
 export function scaledBudget(base: Configuration, multiplier: number): Configuration {
   if (![2, 3].includes(multiplier)) throw new Error('本次实验仅比较 2 倍、3 倍预算');

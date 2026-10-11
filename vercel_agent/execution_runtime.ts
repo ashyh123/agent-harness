@@ -1,5 +1,5 @@
 import { createDeepSeek } from '@ai-sdk/deepseek';
-import { ToolLoopAgent, generateText, isStepCount, jsonSchema, tool, Output, NoObjectGeneratedError,
+import { generateText, jsonSchema, tool, Output, NoObjectGeneratedError,
   type JSONSchema7, type ModelMessage, type ToolSet } from 'ai';
 import { BridgeError, PythonBridge } from './bridge.js';
 import { CONTEXT_INSTRUCTION, SUMMARY_INSTRUCTION, ContextError, DEFAULT_CONTEXT_POLICY,
@@ -30,7 +30,6 @@ export interface RunResult {
   reading_validation?: ReadingValidation[];
   reading_review?: 'structural' | 'semantic';
 }
-class RunStopped extends Error {}
 
 export interface ToolCompletion {
   toolName: string;
@@ -39,7 +38,7 @@ export interface ToolCompletion {
 }
 
 export function createExecutionRuntime(bridge: PythonBridge, config: Configuration, fetcher: typeof fetch,
-  options: { onNotice?: (notice: string) => void } = {}, executeTools = true) {
+  options: { onNotice?: (notice: string) => void } = {}) {
   let fatal: Error | undefined;
   let compact = false;
   let modelKind = 'vercel';
@@ -92,10 +91,6 @@ export function createExecutionRuntime(bridge: PythonBridge, config: Configurati
         };
       },
     }),
-    execute: async (input, { toolCallId }) => {
-      try { return await bridge.request('call_tool', { name: definition.name, arguments: input, tool_call_id: toolCallId }); }
-      catch (failure) { fatal = failure as Error; throw failure; }
-    },
   })]));
 
   const prepareContext = async (current: ModelMessage[]) => {
@@ -170,106 +165,10 @@ export function createExecutionRuntime(bridge: PythonBridge, config: Configurati
     notify(`说明：上下文已自动压缩至约 ${after} tokens（估算）；保留当前任务、来源和回查位置，摘要可能遗漏细节。`);
     return reduced;
   };
-  if (!executeTools) for (const entry of Object.values(tools)) delete entry.execute;
   return { provider, tools, prepareContext, policy, instructions, contextCompactions, notices,
     get fatal() { return fatal; },
     setFatal(error: Error) { fatal ??= error; },
     setCompact() { compact = true; modelKind = 'vercel_compact_retry'; },
     setModelKind(kind: string) { modelKind = kind; },
   };
-}
-
-export class VercelLoop {
-  constructor(public readonly bridge: PythonBridge, public readonly config: Configuration,
-              private readonly fetcher: typeof fetch = fetch) {}
-
-  async run(messages: ModelMessage[], options: { fixtures?: Record<string, unknown>; limits?: Record<string, number>; maxRetries?: number;
-    onNotice?: (notice: string) => void; toolCompletion?: ToolCompletion; readingContract?: ReadingContract;
-    readingReview?: 'structural' | 'semantic' } = {}): Promise<RunResult> {
-    const limits = { max_steps: this.config.max_steps, max_model_requests: this.config.max_model_requests,
-      max_tool_calls: this.config.max_tool_calls, max_seconds: this.config.max_seconds, ...options.limits };
-    await this.bridge.request('start', { fixtures: options.fixtures, limits });
-    let working: ModelMessage[] = [...messages];
-    const sdkSteps: any[] = [];
-    let compact = false;
-    let answer: string | null = null;
-    let error: string | null = null;
-    let completionSource: RunResult['completion_source'] = null;
-    const runtime = createExecutionRuntime(this.bridge, this.config, this.fetcher, options);
-    const { provider, tools, prepareContext, policy, instructions, contextCompactions, notices } = runtime;
-    const makeAgent = () => new ToolLoopAgent({
-      model: provider(this.config.model), instructions,
-      temperature: this.config.temperature,
-      tools, toolOrder: this.config.tools.map(tool => tool.name),
-      // 默认保留对比基线；可按本轮开启 SDK 的模型请求重试。
-      stopWhen: [isStepCount(limits.max_steps), ({ steps }) => !!options.toolCompletion &&
-        !!steps.at(-1)?.toolResults.some(result => result.toolName === options.toolCompletion!.toolName
-          && options.toolCompletion!.accepts(result.output))], maxRetries: options.maxRetries ?? 0,
-      maxOutputTokens: this.config.max_output_tokens, providerOptions: { deepseek: { thinking: { type: 'disabled' } } },
-      allowSystemInMessages: true,
-      prepareStep: async ({ messages: current }) => {
-        working = await prepareContext(current);
-        return { messages: working };
-      },
-      onStepEnd: async step => {
-        // SDK 的观察回调会吞掉异常，不能依靠在这里 throw 来停止循环。
-        try {
-          for (const call of step.toolCalls) {
-            if (call.invalid) await this.bridge.request('invalid_tool', { name: call.toolName, tool_call_id: call.toolCallId });
-          }
-        } catch (failure) {
-          runtime.setFatal(failure as Error);
-        }
-        sdkSteps.push({ finish_reason: step.finishReason, tool_names: step.toolCalls.map(call => call.toolName),
-                        tool_errors: step.content.filter(part => part.type === 'tool-error').length });
-        if (step.finishReason !== 'length') working = [...working, ...step.response.messages];
-      },
-    });
-
-    try {
-      if (!['legacy', 'working_memory', 'artifact_offload'].includes(policy.strategy)
-          || ![policy.trigger_tokens, policy.target_tokens, policy.max_input_tokens, policy.summary_output_tokens,
-            policy.keep_recent_tokens].every(value => Number.isSafeInteger(value) && value > 0)
-          || policy.target_tokens >= policy.trigger_tokens || policy.trigger_tokens >= policy.max_input_tokens) {
-        throw new ContextError('上下文容量配置无效：应满足 target < trigger < max_input');
-      }
-      let result = await makeAgent().generate({ messages: [...messages] });
-      if (runtime.fatal) throw runtime.fatal;
-      if (result.finishReason === 'length') {
-        compact = true;
-        runtime.setCompact();
-        result = await makeAgent().generate({ messages: [...working, { role: 'system', content: this.config.compact_retry_prompt }] });
-        if (runtime.fatal) throw runtime.fatal;
-      }
-      if (result.finishReason === 'length') throw new RunStopped('自动精简重试仍达到输出上限，本轮未完成');
-      const completedTool = options.toolCompletion && result.steps.at(-1)?.toolResults.find(part =>
-        part.toolName === options.toolCompletion!.toolName && options.toolCompletion!.accepts(part.output));
-      if (completedTool) {
-        const call = result.steps.at(-1)!.toolCalls.find(part => part.toolCallId === completedTool.toolCallId);
-        answer = (compact ? this.config.compact_notice : '') + options.toolCompletion!.render(completedTool.output, call?.input);
-        completionSource = 'verified_tool';
-        // 已验收的工具产物可作为运行终点；宿主返回真实收据，无需模型再口头确认。
-        working.push({ role: 'assistant', content: answer });
-      } else {
-        if (result.finishReason === 'tool-calls') throw new RunStopped('SDK 停在工具步骤，尚无最终答案，本轮未完成');
-        if (!result.text.trim()) throw new RunStopped('模型没有返回完整文本答案');
-        answer = (compact ? this.config.compact_notice : '') + result.text;
-        completionSource = 'model';
-      }
-      // 只有成功才提交本轮历史；通知和用户看到的回答保持一致。
-      if (compact) working = working.filter(message => !(message.role === 'system' && message.content === this.config.compact_retry_prompt));
-      const last = working.at(-1);
-      if (last?.role === 'assistant') working[working.length - 1] = { role: 'assistant', content: answer };
-      messages.splice(0, messages.length, ...working);
-    } catch (failure) {
-      const e = (runtime.fatal ?? failure) as Error & { statusCode?: number };
-      error = e instanceof RunStopped || e instanceof BridgeError || e instanceof ContextError ? e.message : `${e.name}${e.statusCode ? `，HTTP ${e.statusCode}` : ''}`;
-    }
-    const trace = await this.bridge.request('trace');
-    return { ...trace, answer, error, total_tokens: trace.events.reduce((sum: number, event: any) => sum + (event.usage?.total_tokens ?? 0), 0),
-             sdk_steps: sdkSteps, compact_retry_used: compact,
-             context_compactions: contextCompactions, notices, context_policy: policy,
-             completion_source: completionSource,
-             output_truncated: trace.events.some((event: any) => event.finish_reason === 'length' || event.status === 'incomplete') };
-  }
 }

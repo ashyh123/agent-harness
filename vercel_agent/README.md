@@ -1,18 +1,16 @@
-# 用同一套工具比较两个 Agent Loop
+# LangGraph Agent：沿用原Harness策略
 
-定向阅读现在可用 `npm run harness:langgraph -- --contract examples/blog-questions.json webpage-reader "根据约定回答问题"`：先用SQLite FTS5/BM25定位快照，再回读原文、程序验收和独立模型核对；失败在原预算内继续修正。正式24次对照自动通过8/12→11/12，人工复核8/12→10/12，tokens增加50.26%，仍保留默认原循环。[验收与失败报告](../reports/evidence-reading-validation.md)。
+本项目的chat、Harness、主Agent及DeepSeek执行端统一使用`LangGraphLoop`。原Python循环和Vercel ToolLoopAgent实现已移除；AI SDK仅负责单次非流式模型请求。上下文默认legacy、提示词、预算、工具、Skill、任务记录和产物检查沿用原Harness。Codex委派端保持自身原生循环。
 
-新增真正执行模型与工具循环的 [LangGraph 入口](LANGGRAPH.md)：`npm run harness:langgraph -- <skill> "任务"`。它与原 Harness 共用运行策略，图内直接编排单步模型请求与工具执行。博客/JSON/CSV 的 24 次真实对照没有显示完成率或效率提升；[结果与失败分析](../reports/langgraph-execution-validation.md)。默认入口保持原 Vercel 循环。
+`npm run person`启动统一任务中心，`npm run harness -- <skill> "任务"`执行单项任务，`npm run chat`进行工具对话。`harness:langgraph`是兼容别名，不再选择后端。阅读约定及critic仍需显式使用`--contract`；不传时不会加入额外模型核对。
 
-统一对话与并发分配入口见 [person agent 任务中心](TASK_CENTER.md)：`npm run person`。DeepSeek主Agent填写能力/复杂度并审阅产物；TaskCenter规则优先把simple非coding交给DeepSeek，把complex或coding交给Codex，仍校验可用性与能力。TaskRouter启动已选执行端并回收文件，routine失败最多升级一次；没有按实测成本或成功率学习路由。
-
-最新36次同批消融：原Harness严格完成9/12，关闭独立核对8/12，开启核对人工复核后9/12。关闭核对总体tokens下降1.8%，博客组却增加1.9%，未证明保持完成效果并节省预算；默认不变。[最新报告](../reports/evidence-ablation-validation.md)。阅读约定任务可用`--no-critic --contract ...`显式选择程序验收模式，见[使用说明](LANGGRAPH.md)。
+此前SDK/手写/图循环的对照为历史实验，结果与迁移后的默认行为分开；旧实现已删除，相关比较脚本不再提供，需在Git提交`246b5e7`查看原实现。详细流程和可选阅读验收见[LANGGRAPH.md](LANGGRAPH.md)。
 
 已加入借鉴OMP shake的实验性 `artifact_offload` 上下文选项：本地将大网页结果替换为原文回查信息，省去摘要请求，复用已有快照与工具。`npm run verify:offload -- 2` 在原预算/两倍预算下与默认策略配对。24次实测没有证明它能改善长文任务，默认仍为legacy；见 [实现、失败原因与结果](../reports/offload-context-validation.md)。
 
 需要给不同 Agent 发布任务并收回文件时，使用新增的 [统一任务入口](ROUTER.md)：`npm run router -- agents`、`npm run router -- run --agent codex "任务"`。此入口手动选择 Harness 或 Codex CLI，各自保留原来的工具和内部循环；验证见 [任务入口实测](../reports/task-router-validation.md)。
 
-这是现有 Demo 的第二个入口。`agent.py` 保留手写循环；这里由 Vercel AI SDK 的 `ToolLoopAgent` 接管模型请求、工具分发、结果消息与继续循环。两个入口共用 DeepSeek、基线系统提示词、工具库及预算，没有替换原实现；SDK 另外加入下文的上下文压缩策略。默认工具现为九个，`read_saved_webpage` 用于回查持久网页原文，`save_obsidian_blog` 把分析保存到专属 Obsidian vault；`read_data` / `query_data` 解析、转换与统计本轮内存中的 JSON/CSV，无需新凭据或数据落盘。
+默认工具为九个，由Python注册表提供。`read_saved_webpage`回查原文，`search_saved_webpage`用FTS5/BM25定位快照，`save_obsidian_blog`写入专属vault；`read_data`/`query_data`处理本轮JSON/CSV。
 
 预算配置已贯通 SDK 与 Python 桥接：单次运行的 `Configuration.max_steps` 和其他预算会传入执行层，输出恢复和压缩也占用该上限。`npm run verify:budget -- 2` 真实比较 2 倍/3 倍预算，各重复两轮；`npm run verify:budget -- 2 - roomy` 增加上下文阈值对照，避免资料仍在本地安全容量内时过早压缩。默认配置不由实验修改。[48 次实测结果](../reports/budget-comparison-validation.md)；此实验同时扩展请求、工具、耗时与输出上限，不是仅请求次数的因果实验。
 
@@ -57,7 +55,8 @@ flowchart TD
 
 | 文件 | 职责 |
 | --- | --- |
-| `agent.ts` | 配置 `ToolLoopAgent`，保留应用层预算、截断恢复与成功历史提交 |
+| `langgraph_loop.ts` | 图节点拥有模型/工具循环、输出恢复和成功历史提交 |
+| `execution_runtime.ts` | 单次请求适配、计量、原上下文维护和共享工具schema |
 | `context.ts` | 输入容量估算、摘要策略、保留来源与阅读位置、构建压缩后的历史 |
 | `bridge.ts` | 启动本地 Python 子进程，用 JSON Lines 请求/响应传递数据 |
 | `tool_bridge.py` | 导出原工具描述和 JSON Schema，使用原 Pydantic 校验、`execute_tool` 和 `RunContext` |
@@ -159,7 +158,7 @@ npm run typecheck
 
 依赖版本与 `package-lock.json` 固定：`ai@7.0.130`、`@ai-sdk/deepseek@3.0.61`，核对日期 2026-10-07。
 
-- [ToolLoopAgent 参数与默认值](https://ai-sdk.dev/docs/reference/ai-sdk-core/tool-loop-agent)
+- AI SDK用于单次generateText，循环由LangGraph管理。
 - [循环控制与停止条件](https://ai-sdk.dev/docs/agents/loop-control)
 - [DeepSeek provider](https://ai-sdk.dev/providers/ai-sdk-providers/deepseek)
 
@@ -170,4 +169,4 @@ npm run typecheck
 
 ## LangGraph 任务阶段后端
 
-现有 Harness 保留；新增 `npm run langgraph` 为 calculation-audit 提供明确状态、条件分支、SQLite 检查点、审批暂停与跨进程恢复。复用 VercelLoop/PythonBridge 和原预算，恢复粒度为任务阶段。完整运行方式、幂等交付与无法恢复的边界见 [LANGGRAPH.md](LANGGRAPH.md)。离线对照及故障注入见 [验证报告](../reports/langgraph-validation.md)；另已完成 12 轮真实 DeepSeek 配对验证：正常预算两组各 3/3，故意预算不足两组各 0/3；新进程审批恢复未增加模型/工具调用。详见同一报告。
+现有 Harness 保留；新增 `npm run langgraph` 为 calculation-audit 提供明确状态、条件分支、SQLite 检查点、审批暂停与跨进程恢复。复用LangGraphLoop/PythonBridge 和原预算，恢复粒度为任务阶段。完整运行方式、幂等交付与无法恢复的边界见 [LANGGRAPH.md](LANGGRAPH.md)。离线对照及故障注入见 [验证报告](../reports/langgraph-validation.md)；另已完成 12 轮真实 DeepSeek 配对验证：正常预算两组各 3/3，故意预算不足两组各 0/3；新进程审批恢复未增加模型/工具调用。详见同一报告。

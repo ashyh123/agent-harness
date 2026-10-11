@@ -1,5 +1,5 @@
 import { join } from 'node:path';
-import type { Configuration } from './agent.js';
+import type { Configuration } from './execution_runtime.js';
 
 export const PERSON_SKILL = 'person-agent';
 export const PERSON_MAX_SECONDS = 360;

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readingChecks, readingPrompt, readingLength, scaledBudget, type ReadingCase } from '../budget_eval.js';
-import type { Configuration, RunResult } from '../agent.js';
+import type { Configuration, RunResult } from '../execution_runtime.js';
 
 const task: ReadingCase = { id: 'example', url: 'https://example.com/', document_id: 'a'.repeat(64),
   text: 'Read the source carefully before answering.', sections: ['Main'],

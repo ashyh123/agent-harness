@@ -1,7 +1,8 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { join } from 'node:path';
-import { VercelLoop, type Configuration } from './agent.js';
+import { LangGraphLoop } from './langgraph_loop.js';
+import type { Configuration } from './execution_runtime.js';
 import { PythonBridge, ROOT, loadLocalEnv, redact } from './bridge.js';
 import { normaliseWhitespace as normalise, tableRows } from './checks.js';
 
@@ -38,7 +39,7 @@ try {
   async function save() { await writeFile(output, redact(JSON.stringify(report, null, 2))); }
   await save();
   console.log('正在运行指定网页事实表任务，保持现有 512 token 上限及 0 次接口重试。');
-  const result = await new VercelLoop(bridge, config).run([{ role: 'user', content: prompt }]);
+  const result = await new LangGraphLoop(bridge, config).run([{ role: 'user', content: prompt }]);
   report.result = result;
   const page = result.events.find(event => event.type === 'tool' && event.name === 'read_webpage' && typeof event.result?.content === 'string')?.result;
   report.source_metadata = page ? { url: page.url, chars: page.content.length, truncated: page.truncated,

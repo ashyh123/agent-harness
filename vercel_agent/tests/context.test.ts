@@ -5,7 +5,8 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { ModelMessage } from 'ai';
-import { VercelLoop, type Configuration } from '../agent.js';
+import { LangGraphLoop } from '../langgraph_loop.js';
+import type { Configuration } from '../execution_runtime.js';
 import { PythonBridge, ROOT } from '../bridge.js';
 import { collectEvidence, estimateTokens } from '../context.js';
 
@@ -36,7 +37,7 @@ async function setup(t: any, responses: any[], env: NodeJS.ProcessEnv = process.
     assert.ok(body, '发生未预期的额外模型请求');
     return body instanceof Response ? body : new Response(JSON.stringify(body), { headers: { 'content-type': 'application/json' } });
   };
-  return { agent: new VercelLoop(bridge, config, fetcher), config, requests };
+  return { agent: new LangGraphLoop(bridge, config, fetcher), config, requests };
 }
 
 test('真实 SDK 自动压缩后从真实快照回查被摘要遗漏的证据；下一轮沿用压缩历史', async t => {

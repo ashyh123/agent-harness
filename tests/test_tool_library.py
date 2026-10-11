@@ -10,12 +10,10 @@ from unittest.mock import Mock, patch
 import httpx
 from PIL import Image
 
-import agent
 import tools
 from runtime import BudgetExceeded, RunContext
 from tool_library import network, vision, webpage_store
 from tool_library.errors import ToolError
-from test_agent import response
 
 
 class ToolLibraryTests(unittest.TestCase):
@@ -147,29 +145,6 @@ class ToolLibraryTests(unittest.TestCase):
         with self.assertRaises(BudgetExceeded):
             self.call("calculate", {"operation": "add", "a": 1, "b": 2}, context=context)
 
-    def test_loop_handles_image_then_calculation(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory) / "images"
-            root.mkdir()
-            Image.new("RGB", (20, 20), "red").save(root / "sample.png")
-            client = Mock()
-            client.responses.create.return_value = SimpleNamespace(status="completed", output_text="图片中两个数是 12 和 3。", usage=None)
-            def call(identifier, name, arguments):
-                return {"id": identifier, "type": "function", "function": {"name": name, "arguments": json.dumps(arguments)}}
-            client.chat.completions.create.side_effect = [
-                response(calls=[call("image", "analyze_image", {"image_source": "images/sample.png", "question": "读取两个数"})], finish_reason="tool_calls"),
-                response(calls=[call("math", "calculate", {"operation": "multiply", "a": 12, "b": 3})], finish_reason="tool_calls"),
-                response("结果是 36。"),
-            ]
-            context = RunContext(client=client)
-            messages = [{"role": "user", "content": "读图计算"}]
-            with patch("tool_library.vision.IMAGE_DIR", root), contextlib.redirect_stdout(io.StringIO()):
-                answer = agent.run_agent(client, messages, context=context)
-            self.assertEqual(answer, "结果是 36。")
-            self.assertEqual(context.model_requests, 4)  # 三次外层请求，加一次视觉请求。
-            self.assertEqual(context.tool_calls, 2)
-            self.assertEqual([item["tool_call_id"] for item in messages if item["role"] == "tool"], ["image", "math"])
-            self.assertEqual(json.loads(messages[-2]["content"])["result"], 36)
 
 
 if __name__ == "__main__":

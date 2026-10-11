@@ -1,7 +1,7 @@
 /** Offline fixture: real Vercel SDK + real Python calculate; only model HTTP is mocked. */
 import { MinimalHarness, type TaskInput } from './harness.js';
 import { PythonBridge } from './bridge.js';
-import type { Configuration } from './agent.js';
+import type { Configuration } from './execution_runtime.js';
 import { SKILLS_ROOT } from './skills.js';
 export async function fixtureHarness(runs: string, input: TaskInput, maxRequests = 8) {
   const bridge = new PythonBridge({ ...process.env, DEEPSEEK_API_KEY: 'offline-test-key' });

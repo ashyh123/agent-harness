@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import type { ModelMessage } from 'ai';
-import { VercelLoop, type Configuration } from '../agent.js';
+import { LangGraphLoop } from '../langgraph_loop.js';
+import type { Configuration } from '../execution_runtime.js';
 import { PythonBridge } from '../bridge.js';
 import { collectEvidence, compactedMessages } from '../context.js';
 
@@ -38,7 +39,7 @@ test('真实 SDK 复用共享数据工具，查询全量内存数据并在新任
     }
     return new Response(JSON.stringify(body), { headers: { 'content-type': 'application/json' } });
   };
-  const result = await new VercelLoop(bridge, config, fetcher).run([{ role: 'user', content: '统计 CSV' }]);
+  const result = await new LangGraphLoop(bridge, config, fetcher).run([{ role: 'user', content: '统计 CSV' }]);
   assert.equal(result.error, null);
   assert.equal(result.model_requests, 3);
   assert.equal(result.tool_calls, 2);
@@ -92,7 +93,7 @@ test('真实 SDK 压缩后 query_data 能统计仍在内存的全部原始记录
     }
     return new Response(JSON.stringify(body), { headers: { 'content-type': 'application/json' } });
   };
-  const result = await new VercelLoop(bridge, config, fetcher).run([{ role: 'user', content: '计算所有记录 n 之和' }]);
+  const result = await new LangGraphLoop(bridge, config, fetcher).run([{ role: 'user', content: '计算所有记录 n 之和' }]);
   assert.equal(result.error, null);
   assert.equal(result.answer, '{"sum":21}');
   assert.equal(result.context_compactions.length, 1);
@@ -126,7 +127,7 @@ test('无效分页参数返回具体字段错误，模型可修正且复用原�
     }
     return new Response(JSON.stringify(body), { headers: { 'content-type': 'application/json' } });
   };
-  const result = await new VercelLoop(bridge, config, fetcher).run([{ role: 'user', content: '统计行数' }]);
+  const result = await new LangGraphLoop(bridge, config, fetcher).run([{ role: 'user', content: '统计行数' }]);
   assert.equal(result.error, null);
   assert.equal(result.answer, '{"count":2}');
   assert.equal(result.model_requests, 4);

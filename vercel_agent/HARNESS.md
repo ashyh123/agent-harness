@@ -1,10 +1,10 @@
 # 最薄 Harness：给现有 Loop 一个任务运行外壳
 
-这个入口将“选择流程、执行任务、留下可验收结果”串起来。使用原来的 Vercel SDK Loop、DeepSeek 和共享 Python 工具库（当前八个工具）。Harness 自身没有额外依赖；工具依赖由根目录 requirements.txt 管理。
+这个入口将“选择流程、执行任务、留下可验收结果”串起来。使用默认LangGraph Loop、DeepSeek和共享Python工具库（当前九个工具）。Harness 自身没有额外依赖；工具依赖由根目录 requirements.txt 管理。
 
 希望通过同一个入口给 Harness 或 Codex CLI 发布任务时，见 [统一任务入口](ROUTER.md)。路由器负责执行端选择、任务目录和文件收录，Harness 仍负责自己的 Skill 与模型工具循环。
 
-新增的 [person-agent 流程](PERSON_AGENT.md) 在原循环中启用委派 Codex 和回读产物两个工具；调用 `npm run person -- "任务"`，由 DeepSeek 决定委派参数并审阅返回的文件。
+新增的 [person-agent 流程](PERSON_AGENT.md) 在默认循环中启用委派 Codex 和回读产物两个工具；调用 `npm run person:delegate -- "任务"`，由DeepSeek决定委派参数并审阅返回的文件；`npm run person`是并发任务中心入口。
 
 ## 先跑起来
 
@@ -51,7 +51,7 @@ flowchart TD
     B --> C[保存初始 run.json]
     C --> D[原系统提示词 + 本次 Skill 指令]
     D --> E[新建独立消息上下文]
-    E --> F[已有 VercelLoop]
+    E --> F[默认LangGraphLoop]
     F --> M[DeepSeek 模型]
     M -->|提出工具调用| T[原工具注册表 / Python 桥接]
     T -->|返回结果| M

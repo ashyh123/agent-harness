@@ -2,7 +2,8 @@ import { createInterface } from 'node:readline';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { ModelMessage } from 'ai';
-import { VercelLoop, type Configuration } from './agent.js';
+import { LangGraphLoop } from './langgraph_loop.js';
+import type { Configuration } from './execution_runtime.js';
 import { PythonBridge, ROOT, loadLocalEnv, redact } from './bridge.js';
 
 loadLocalEnv();
@@ -13,7 +14,7 @@ if (!process.env.DEEPSEEK_API_KEY) {
 const bridge = new PythonBridge();
 try {
   const config = await bridge.request<Configuration>('describe');
-  const agent = new VercelLoop(bridge, config);
+  const agent = new LangGraphLoop(bridge, config);
   const messages: ModelMessage[] = [];
   async function runTurn(prompt: string) {
     const turnStart = messages.length;
@@ -30,7 +31,7 @@ try {
   const prompt = process.argv.slice(2).join(' ').trim();
   if (prompt) await runTurn(prompt);
   else {
-    console.log(`Vercel AI SDK Agent，模型 ${config.model}；输入 /exit 退出。`);
+    console.log(`LangGraph Agent，模型 ${config.model}；输入 /exit 退出。`);
     const input = createInterface({ input: process.stdin, output: process.stdout });
     if (process.stdin.isTTY) {
       input.setPrompt('你：');

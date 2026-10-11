@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {checkReading,checkCritic,validateReadingContract, type ReadingContract} from '../reading_validation.js';
 import {LangGraphLoop} from '../langgraph_loop.js';
 import {PythonBridge} from '../bridge.js';
-import type {Configuration} from '../agent.js';
+import type {Configuration} from '../execution_runtime.js';
 const contract:ReadingContract={document_id:'a'.repeat(64),source_url:'https://example.com/post',questions:[{id:'size',question:'How many tasks?'}]};
 const content='Start with 20-50 tasks from real failures. Do not measure success by a claim.';
 const answer=JSON.stringify({facts:[{id:'size',answer:'从20–50个真实失败任务开始',quote:'20-50 tasks from real failures'}],source_url:contract.source_url,reading_scope:'targeted',page_completeness:'not_verified'});

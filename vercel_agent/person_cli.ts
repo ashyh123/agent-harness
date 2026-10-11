@@ -11,7 +11,7 @@ import { CenterConversation } from './center_conversation.js';
 import { MinimalHarness } from './harness.js';
 import { SKILLS_ROOT } from './skills.js';
 import { COORDINATOR_SKILL, harnessConfiguration, harnessEnvironment } from './person_profile.js';
-import type { Configuration } from './agent.js';
+import type { Configuration } from './execution_runtime.js';
 import { completedTaskPaths, renderCompletedTaskPaths } from './center_presentation.js';
 
 async function main() {

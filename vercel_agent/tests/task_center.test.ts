@@ -10,7 +10,7 @@ import { TaskCenterServer } from '../task_center_server.js';
 import { CenterConversation } from '../center_conversation.js';
 import { PythonBridge } from '../bridge.js';
 import { MinimalHarness } from '../harness.js';
-import type { Configuration } from '../agent.js';
+import type { Configuration } from '../execution_runtime.js';
 import { COORDINATOR_SKILL, harnessConfiguration } from '../person_profile.js';
 import { SKILLS_ROOT } from '../skills.js';
 import { compactedMessages, collectEvidence } from '../context.js';

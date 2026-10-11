@@ -1,6 +1,6 @@
 # person agent：独立任务的并发分配中心
 
-复用现有 Harness、Vercel Loop、Python 工具桥接和 TaskRouter。用户向 DeepSeek 主 Agent 发布任务；主 Agent 提出能力、复杂度和验收，调度器选择已注册执行端，最多同时执行两项互不依赖的任务，完成后收消息、回读产物并审阅。
+复用现有 Harness、LangGraph Loop、Python 工具桥接和 TaskRouter。用户向 DeepSeek 主 Agent 发布任务；主 Agent 提出能力、复杂度和验收，调度器选择已注册执行端，最多同时执行两项互不依赖的任务，完成后收消息、回读产物并审阅。
 
 没有新增项目依赖。借鉴 agent-router 的候选筛选与路由分层，没有安装 TypeSafe 或 Herdr。
 

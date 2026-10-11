@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { ModelMessage } from 'ai';
-import { VercelLoop, type Configuration } from './agent.js';
+import { LangGraphLoop } from './langgraph_loop.js';
+import type { Configuration } from './execution_runtime.js';
 import { PythonBridge, ROOT, loadLocalEnv, redact } from './bridge.js';
 
 async function main() {
@@ -18,7 +19,7 @@ async function main() {
   try {
     const configuration = await bridge.request<Configuration>('describe');
     const messages: ModelMessage[] = [{ role: 'user', content: prompt }];
-    const result = await new VercelLoop(bridge, configuration).run(messages, {
+    const result = await new LangGraphLoop(bridge, configuration).run(messages, {
       onNotice: notice => console.log(redact(notice)),
     });
     await writeFile(join(directory, 'run.json'), redact(JSON.stringify({ prompt, configuration,

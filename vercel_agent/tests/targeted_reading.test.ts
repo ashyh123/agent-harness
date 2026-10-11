@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { targetedChecks, targetedPrompt } from '../targeted_reading.js';
 import type { ReadingCase } from '../budget_eval.js';
-import type { RunResult } from '../agent.js';
+import type { RunResult } from '../execution_runtime.js';
 
 const task: ReadingCase = { id: 'targeted', url: 'https://example.com/blog', document_id: 'a'.repeat(64),
   text: 'Irrelevant introduction. Start with 20-50 tasks drawn from real failures. Unneeded appendix.', sections: [],

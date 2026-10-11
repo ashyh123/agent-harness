@@ -1,7 +1,7 @@
 /** LangGraph owns the model -> tools -> model cycle. No ToolLoopAgent here. */
 import { Annotation, StateGraph, START, END } from '@langchain/langgraph';
 import { generateText, type ModelMessage } from 'ai';
-import { createExecutionRuntime, type Configuration, type RunResult, type ToolCompletion } from './agent.js';
+import { createExecutionRuntime, type Configuration, type RunResult, type ToolCompletion } from './execution_runtime.js';
 import { PythonBridge, BridgeError } from './bridge.js';
 import { ContextError } from './context.js';
 import { checkReading, checkCritic, CRITIC_INSTRUCTIONS, validateReadingContract,
@@ -28,7 +28,7 @@ export class LangGraphLoop {
     const limits = { max_steps: this.config.max_steps, max_model_requests: this.config.max_model_requests,
       max_tool_calls: this.config.max_tool_calls, max_seconds: this.config.max_seconds, ...options.limits };
     await this.bridge.request('start', { fixtures: options.fixtures, limits });
-    const runtime = createExecutionRuntime(this.bridge, this.config, this.fetcher, options, false);
+    const runtime = createExecutionRuntime(this.bridge, this.config, this.fetcher, options);
     const policy = runtime.policy;
     const sdkSteps: any[] = [];
     let compact = false;
@@ -77,7 +77,7 @@ export class LangGraphLoop {
         for (const call of state.calls) {
           let output;
           if (call.invalid || !this.config.tools.some(t=>t.name===call.toolName)) {
-            output = await this.bridge.request('invalid_tool', { name: call.toolName, tool_call_id: call.toolCallId });
+            output = await this.bridge.request('invalid_tool', { name: call.toolName, arguments: call.input, tool_call_id: call.toolCallId });
           } else {
             output = await this.bridge.request('call_tool', { name: call.toolName, arguments: call.input,
               tool_call_id: call.toolCallId });

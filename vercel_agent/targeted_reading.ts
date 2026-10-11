@@ -1,4 +1,4 @@
-import type { RunResult } from './agent.js';
+import type { RunResult } from './execution_runtime.js';
 import { readingChecks, readingLength, parseAnswer, type ReadingCase } from './budget_eval.js';
 
 /** 按问题验收；读取覆盖率只作诊断，不作为必须读完全文的门槛。 */

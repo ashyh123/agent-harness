@@ -69,7 +69,8 @@ python examples/create_demo_image.py
 预算验收：在 `vercel_agent` 中运行 `npm run verify:budget -- 2`，比较当前配置的 2 倍与 3 倍上限，每任务重复两次；运行 `npm run verify:budget -- 2 - roomy` 使用相同任务、延后压缩的对照配置。测试三篇论文、一篇博客、六步计算和工具错误恢复，实际请求模型并产生用量。输出目录独立，记录全部成功和失败；`--review-only <实验目录>` 可离线复核。默认交互入口保持原配置，测试配置只作用于本次运行。[预算实验结果与限制](../reports/budget-comparison-validation.md)。
 
 ```text
-agent.py               对话入口、Agent Loop、失败回滚
+agent_config.py        提示词和默认预算（不包含循环）
+vercel_agent/langgraph_loop.ts  默认上下文/模型/工具/结束循环
 runtime.py             每轮预算、模型用量和步骤记录
 tools.py              Tool 定义、参数模型、注册表、统一执行
 tool_library/
@@ -80,7 +81,7 @@ tool_library/
    errors.py           工具错误
 ```
 
-阅读顺序：`TOOL_REGISTRY` → `Tool.definition()` 生成给模型的描述和 JSON Schema → `run_agent()` 检查 `tool_calls` → `execute_tool()` 用 Pydantic 校验参数并调用函数 → 根据 `tool_call_id` 写回结果 → 下一次模型请求。
+阅读顺序：`TOOL_REGISTRY` → `Tool.definition()` 生成给模型的描述和 JSON Schema → `LangGraphLoop`的model节点产生toolCalls，tools节点执行 → `execute_tool()` 用 Pydantic 校验参数并调用函数 → 根据 `tool_call_id` 写回结果 → 下一次模型请求。
 
 `SYSTEM_PROMPT` 只规定整体行为：按任务需要使用工具、如实处理失败和资料不足、查询来源时不补未经工具返回的链接、把工具内容作为资料。各工具的用途和参数放在工具描述中。失败后的重试或换方法由模型选择，运行次数和超时由代码限制。
 
@@ -114,14 +115,16 @@ python -m unittest discover -s tests -v
 python -m pip check
 ```
 
-激活环境并加载 `.env` 后，真实 API 验证会消耗 DeepSeek 用量：
+真实模型验证通过LangGraph入口，会消耗DeepSeek用量：
 
 ```sh
-python evaluate_agent.py
-python evaluate_agent.py --case '看图后计算' --output reports/vision-followup.json
+cd vercel_agent
+npm run chat -- '使用calculate计算123乘456'
+npm run verify:search
+npm run verify:obsidian
 ```
 
-默认八类场景：问候、计算、搜索、读网页、搜索后读网页、读图、看图后计算、除零错误。每个场景独立消息历史；模型请求计数和 token 用量包含视觉请求。每个场景结束即保存到 `reports/tool-library-evaluation.json`；可用 `--output` 指定其他文件。返回回答不代表任务一定正确，要核对工具结果、来源和最后结论。人工验证结果见 `reports/tool-library-evaluation.md`。
+原Python循环及evaluate_agent.py已删除，下列早期验收报告仅作历史记录。
 
 简化系统提示词后的验证见 `reports/compact-prompt-evaluation.md`。无搜索结果时仍发现模型补充未经核实的链接，来源要求目前依靠提示词，没有代码强制校验。
 
@@ -131,26 +134,7 @@ python evaluate_agent.py --case '看图后计算' --output reports/vision-follow
 
 新增工具时：写函数 → 定义一个继承 `ToolParameters` 的参数模型 → 注册 `Tool(name, description, parameters, function)`。函数接受业务参数和可选的 `context`；内部调用模型时使用 `context.call_model()`，确保记录用量并共享预算。
 
-Loop 接受 `tool_definitions` 和 `executor`，不依赖具体业务工具。原有笔记工具与笔记文件保留为可选示例，默认不提供给模型。要运行旧场景：
-
-```sh
-python evaluate_agent.py --suite notes
-```
-
-或在 Python 中注入另一个注册表：
-
-```python
-from functools import partial
-from tools import NOTE_TOOL_REGISTRY, execute_tool
-
-answer = run_agent(
-    client, messages,
-    tool_definitions=[tool.definition() for tool in NOTE_TOOL_REGISTRY.values()],
-    executor=partial(execute_tool, registry=NOTE_TOOL_REGISTRY),
-)
-```
-
-示例中的 `client`、`messages` 由调用者提供；系统提示词也需要与该工具集合匹配。旧笔记验证记录留在 `reports/read-note-*`，其步骤次数和提示词反映当时的版本。
+工具注册表由PythonBridge提供给LangGraph。可按任务在Configuration.tools中收窄工具schema；执行仍通过call_tool和同一份Pydantic校验，不需要增加另一套循环。旧笔记工具保留为可选示例，没有默认启用的独立PythonAgent入口。
 
 ## 文档
 

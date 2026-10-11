@@ -1,4 +1,4 @@
-import type { RunResult } from './agent.js';
+import type { RunResult } from './execution_runtime.js';
 
 export interface ContextEvalRow {
   task: string; repeat: number; strategy: 'legacy' | 'working_memory';

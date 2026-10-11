@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { dataChecks, matchesExpected, type DataCase } from '../diverse_eval.js';
-import type { RunResult } from '../agent.js';
+import type { RunResult } from '../execution_runtime.js';
 
 const url = 'https://example.com/data.txt';
 const task: DataCase = { id: 'sample', prompt: '', expected: { rows: [{ year: 2024, value: 1.29 }], missing: null },

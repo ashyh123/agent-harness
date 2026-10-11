@@ -6,7 +6,7 @@ import { MinimalHarness, type TaskInput } from './harness.js';
 import { PythonBridge, ROOT, loadLocalEnv, redact } from './bridge.js';
 import { harnessConfiguration, harnessEnvironment } from './person_profile.js';
 import { SKILLS_ROOT } from './skills.js';
-import type { Configuration } from './agent.js';
+import type { Configuration } from './execution_runtime.js';
 import { openLangGraphBackend, type Execution } from './langgraph_backend.js';
 
 const cases = [

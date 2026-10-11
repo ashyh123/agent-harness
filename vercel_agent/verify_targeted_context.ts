@@ -5,7 +5,7 @@ import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { MinimalHarness } from './harness.js';
 import { PythonBridge, ROOT, loadLocalEnv, redact } from './bridge.js';
-import type { Configuration } from './agent.js';
+import type { Configuration } from './execution_runtime.js';
 import { DEFAULT_CONTEXT_POLICY } from './context.js';
 import { contextDecision, type ContextEvalRow } from './context_eval.js';
 import { scaledBudget, type ReadingCase } from './budget_eval.js';

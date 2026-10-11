@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import type { ModelMessage } from 'ai';
-import type { Configuration } from '../agent.js';
+import type { Configuration } from '../execution_runtime.js';
 import { LangGraphLoop } from '../langgraph_loop.js';
 import { PythonBridge } from '../bridge.js';
 

@@ -5,7 +5,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { PythonBridge } from '../bridge.js';
 import { MinimalHarness } from '../harness.js';
-import { VercelLoop, type Configuration } from '../agent.js';
+import { LangGraphLoop } from '../langgraph_loop.js';
+import type { Configuration } from '../execution_runtime.js';
 import { harnessConfiguration } from '../person_profile.js';
 import { SKILLS_ROOT } from '../skills.js';
 import { collectEvidence, compactedMessages } from '../context.js';
@@ -94,7 +95,7 @@ test('父模型重复委派同一任务只启动一个CLI，结果复用仍计�
   const { bridge, config, fetcher } = await setup(t, (_request, index) => {
     return index === 0 ? completion(null, [call('a', 'delegate_to_codex', delegatedInput), call('b', 'delegate_to_codex', delegatedInput)]) : completion('复用同一个子任务');
   });
-  const result = await new VercelLoop(bridge, config, fetcher).run([{ role: 'user', content: '重复调用测试' }]);
+  const result = await new LangGraphLoop(bridge, config, fetcher).run([{ role: 'user', content: '重复调用测试' }]);
   assert.equal(result.error, null);
   const events = result.events.filter(event => event.type === 'tool');
   assert.equal(events.length, 2);

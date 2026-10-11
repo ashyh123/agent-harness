@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import type { ModelMessage } from 'ai';
 import { offloadContext } from '../offload_context.js';
 import { DEFAULT_CONTEXT_POLICY, estimateInput, CONTEXT_INSTRUCTION, SUMMARY_INSTRUCTION } from '../context.js';
-import { VercelLoop, type Configuration } from '../agent.js';
+import { LangGraphLoop } from '../langgraph_loop.js';
+import type { Configuration } from '../execution_runtime.js';
 import { PythonBridge } from '../bridge.js';
 
 const id = 'a'.repeat(64);
@@ -86,7 +87,7 @@ async function setup(t: any, responses: any[]) {
     const next = responses.shift(); assert.ok(next, '不得额外请求摘要模型');
     return new Response(JSON.stringify(next), { headers: { 'content-type': 'application/json' } });
   };
-  return { config, requests, agent: new VercelLoop(bridge, config, fetcher) };
+  return { config, requests, agent: new LangGraphLoop(bridge, config, fetcher) };
 }
 test('真实SDK先观察新结果，再移出旧正文续跑；原工具证据和用量保留，短任务不触发', async t => {
   const { agent, requests } = await setup(t, [completion(null, [{ id: 'page-1', type: 'function',

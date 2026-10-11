@@ -1,6 +1,7 @@
 import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { VercelLoop, type Configuration, type RunResult } from './agent.js';
+import { LangGraphLoop } from './langgraph_loop.js';
+import type { Configuration, RunResult } from './execution_runtime.js';
 import { PythonBridge, ROOT, redact } from './bridge.js';
 import { SKILL_CHECKS, type CheckReport } from './checks.js';
 import { loadSkill, SKILLS_ROOT, type Skill } from './skills.js';
@@ -40,8 +41,8 @@ export class MinimalHarness {
   constructor(private readonly bridge: PythonBridge, private readonly config: Configuration,
               private readonly paths = { skills: SKILLS_ROOT, runs: join(ROOT, 'reports/harness') },
               private readonly fetcher: typeof fetch = fetch,
-              private readonly loopFactory: (bridge: PythonBridge, config: Configuration, fetcher: typeof fetch) => Pick<VercelLoop, 'run'>
-                = (bridge, config, fetcher) => new VercelLoop(bridge, config, fetcher)) {}
+              private readonly loopFactory: (bridge: PythonBridge, config: Configuration, fetcher: typeof fetch) => Pick<LangGraphLoop, 'run'>
+                = (bridge, config, fetcher) => new LangGraphLoop(bridge, config, fetcher)) {}
 
   async run(input: TaskInput, options: { onNotice?: (notice: string) => void;
     fixtures?: Record<string, unknown> } = {}): Promise<{ directory: string; record: HarnessRecord }> {

@@ -5,7 +5,6 @@ import os
 import sys
 import time
 from dataclasses import replace
-from functools import partial
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -13,8 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from openai import OpenAI, OpenAIError
 from pydantic import ValidationError
 
-from agent import SYSTEM_PROMPT, COMPACT_RETRY_PROMPT, COMPACT_NOTICE, MAX_STEPS, MAX_MODEL_REQUESTS, MAX_OUTPUT_TOKENS
-from evaluate_agent import evaluate_case
+from agent_config import SYSTEM_PROMPT, COMPACT_RETRY_PROMPT, COMPACT_NOTICE, MAX_STEPS, MAX_MODEL_REQUESTS, MAX_OUTPUT_TOKENS
 from runtime import BudgetExceeded, RunContext
 from tools import TOOL_REGISTRY, execute_tool
 
@@ -70,11 +68,6 @@ class Worker:
         if operation == "capture_tool":
             return json.loads(execute_tool(request["name"], json.dumps(request["arguments"], ensure_ascii=False),
                                            context=RunContext(client=self.client)))
-        if operation == "run_python":
-            if self.client is None:
-                raise RuntimeError("需要加载 DEEPSEEK_API_KEY")
-            return evaluate_case(self.client, request["name"], request["prompt"],
-                                 executor=partial(execute_tool, registry=fixture_registry(request.get("fixtures", {}))))
         if self.context is None:
             raise RuntimeError("请先开始一轮运行")
         context = self.context
@@ -99,6 +92,11 @@ class Worker:
                 raise BudgetExceeded("已达到本轮工具调用上限")
             context.tool_calls += 1
             result = {"error": {"code": "sdk_validation_error", "message": "SDK 拒绝未知工具或无效参数，未执行工具"}}
+            if request["name"] in self.registry and "arguments" in request:
+                try:
+                    self.registry[request["name"]].parameters.model_validate(request["arguments"])
+                except ValidationError as error:
+                    result["error"]["details"] = error.errors(include_input=False, include_url=False, include_context=False)[:5]
             context.events.append({"type": "tool", "name": request["name"], "tool_call_id": request["tool_call_id"],
                                    "result": result, "elapsed_seconds": 0})
             return result

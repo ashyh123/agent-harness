@@ -5,7 +5,7 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { MinimalHarness } from '../harness.js';
-import type { Configuration } from '../agent.js';
+import type { Configuration } from '../execution_runtime.js';
 import { PythonBridge, ROOT } from '../bridge.js';
 import { SKILLS_ROOT } from '../skills.js';
 

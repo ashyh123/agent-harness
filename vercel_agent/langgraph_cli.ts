@@ -4,7 +4,7 @@ import { MinimalHarness } from './harness.js';
 import { PythonBridge, loadLocalEnv, redact } from './bridge.js';
 import { SKILLS_ROOT } from './skills.js';
 import { harnessConfiguration, harnessEnvironment } from './person_profile.js';
-import type { Configuration } from './agent.js';
+import type { Configuration } from './execution_runtime.js';
 
 async function main() {
   const [action, path, ...args] = process.argv.slice(2);

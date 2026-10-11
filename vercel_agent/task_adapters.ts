@@ -29,7 +29,7 @@ export async function findCodex(configured = process.env.MINIMAL_AGENT_CODEX_BIN
 
 export function createTaskAdapters(options: { codexBinary?: string } = {}): AgentAdapter[] {
   return [{
-    id: 'harness', description: '现有DeepSeek + Vercel Harness；须指定本地Skill。',
+    id: 'harness', description: 'DeepSeek + LangGraph Harness；须指定本地Skill。',
     validate: async task => { if (!task.skill) throw new Error('harness执行端需要--skill'); await loadSkill(task.skill); },
     launch: async (task, paths) => ({ executable: process.execPath,
       args: [join(ROOT, 'vercel_agent/node_modules/tsx/dist/cli.mjs'),

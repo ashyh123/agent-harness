@@ -2,7 +2,8 @@
 import assert from 'node:assert/strict';
 import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { VercelLoop, type Configuration } from './agent.js';
+import { LangGraphLoop } from './langgraph_loop.js';
+import type { Configuration } from './execution_runtime.js';
 import { PythonBridge, ROOT, loadLocalEnv, redact } from './bridge.js';
 
 async function main() {
@@ -15,7 +16,7 @@ async function main() {
   const bridge = new PythonBridge();
   try {
     const configuration = await bridge.request<Configuration>('describe');
-    const result = await new VercelLoop(bridge, configuration).run([{ role: 'user', content: prompt }]);
+    const result = await new LangGraphLoop(bridge, configuration).run([{ role: 'user', content: prompt }]);
     await writeFile(join(directory, 'run.json'), redact(JSON.stringify({ prompt, configuration, ...result }, null, 2)) + '\n');
     await writeFile(join(directory, 'answer.md'), redact(result.answer ?? `未完成：${result.error}`) + '\n');
     const searches = result.events.filter(event => event.type === 'tool' && event.name === 'web_search');

@@ -4,7 +4,7 @@ import { mkdtemp, readFile, readdir, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { MinimalHarness } from '../harness.js';
-import type { Configuration } from '../agent.js';
+import type { Configuration } from '../execution_runtime.js';
 import { PythonBridge } from '../bridge.js';
 import { SKILLS_ROOT } from '../skills.js';
 
@@ -42,6 +42,10 @@ test('不同 Skill 复用同一工具库，任务上下文隔离，运行记录�
   assert.match(JSON.stringify(requests[0].messages), /算术必须使用 calculate/);
   assert.match(JSON.stringify(requests[2].messages), /搜索摘要不能代替指定网页原文/);
   assert.doesNotMatch(JSON.stringify(requests[2].messages), /123|56088|算术必须/);
+  assert.equal(first.record.result?.context_policy.strategy, 'legacy');
+  assert.deepEqual(first.record.result?.graph_nodes, ['prepare_context', 'model', 'tools', 'prepare_context', 'model', 'finish']);
+  assert.equal(first.record.result?.reading_validation, undefined);
+  assert.ok(!first.record.result?.events.some(event => event.kind === 'reading_critic'));
   assert.equal(first.record.result?.tool_calls, 1);
   assert.equal(first.record.result?.model_requests, 2);
   assert.equal(first.record.result?.events.find(event => event.type === 'tool').result.result, 56088);

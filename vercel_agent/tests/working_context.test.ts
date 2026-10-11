@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import type { ModelMessage } from 'ai';
 import { collectEvidence, DEFAULT_CONTEXT_POLICY, estimateInput } from '../context.js';
 import { planWorkingContext, parseWorkingState, workingMessages, type WorkingState } from '../working_context.js';
-import { VercelLoop, type Configuration } from '../agent.js';
+import { LangGraphLoop } from '../langgraph_loop.js';
+import type { Configuration } from '../execution_runtime.js';
 import { PythonBridge } from '../bridge.js';
 
 const state = (facts: WorkingState['facts'] = []): WorkingState => ({ goal: '核对增长率', constraints: ['必须引用原文'],
@@ -106,7 +107,7 @@ test('真实SDK的新策略计入摘要预算，只执行一次原工具；格�
     };
     const messages: ModelMessage[] = [{ role: 'user', content: '核对增长率' }];
     const before = structuredClone(messages);
-    const result = await new VercelLoop(bridge, config, fetcher).run(messages, { fixtures: { read_webpage: {
+    const result = await new LangGraphLoop(bridge, config, fetcher).run(messages, { fixtures: { read_webpage: {
       document_id: 'a'.repeat(64), url: 'https://example.com/post', content: 'A'.repeat(20000),
       content_format: 'text', total_chars: 20000, completeness: 'not_verified',
     } } });

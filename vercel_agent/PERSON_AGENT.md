@@ -1,6 +1,6 @@
 # DeepSeek 的 person agent：委派 Codex，收回并审阅文件
 
-这个入口让现有 DeepSeek 模型自己提出委派工具调用。Codex 执行后，收据成为 DeepSeek 的工具结果；DeepSeek 再决定回读哪些产物并给出自己的总结。没有重写 Vercel Agent Loop，没有新增包依赖。
+这个入口让现有 DeepSeek 模型自己提出委派工具调用。Codex 执行后，收据成为 DeepSeek 的工具结果；DeepSeek 再决定回读哪些产物并给出自己的总结。没有重写 LangGraph Agent Loop，没有新增包依赖。
 
 ## 运行
 
@@ -33,7 +33,7 @@ npm run person:delegate -- "把 https://www.anthropic.com/engineering/managed-ag
 ```mermaid
 flowchart TD
     U[用户给 person agent 发布任务] --> P[原 Harness 加载 person-agent Skill]
-    P --> D[DeepSeek：原 Vercel ToolLoopAgent]
+    P --> D[DeepSeek：LangGraph内部循环]
     D -->|delegate_to_codex| T[Python 工具注册表]
     T --> R[已有 TaskRouter：独立目录与 Codex CLI]
     R --> C[Codex：读取资料、分析、写文件]
@@ -47,7 +47,7 @@ flowchart TD
     H --> U
 ```
 
-“委派”仍是一次工具调用：外层模型看到工具描述，返回名称、参数、tool_call_id；原循环执行工具并把结果交回下一次模型请求。不同之处在于这个工具内部运行了另一个 Agent，内部模型循环由 Codex 管理。不能把一次委派说成一次 Codex 模型请求。
+“委派”仍是一次工具调用：外层模型看到工具描述，返回名称、参数、tool_call_id；LangGraph的tools节点执行工具并把结果交回下一次模型请求。不同之处在于这个工具内部运行了另一个 Agent，内部模型循环由 Codex 管理。不能把一次委派说成一次 Codex 模型请求。
 
 ## 预算和验收边界
 

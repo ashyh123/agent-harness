@@ -4,9 +4,9 @@
 
 项目从手写 Agent Loop 演进而来，将工具、Skill、上下文维护、预算、调度和验收分开组织。DeepSeek 主 Agent 负责理解任务、提出分类并审阅结果；任务中心按能力、可用性和复杂度规则选择执行端，TaskRouter 负责启动进程、隔离目录、取消和回收产物。当前最多并发两项独立任务，DeepSeek失败后可在条件允许时升级到Codex一次。
 
-保留 Python 手写、Vercel SDK 和 LangGraph 三种循环，以及固定任务下的真实对照记录。定向阅读支持快照全文检索、原文回读、程序验收和可选独立模型核对，但没有证明新框架或额外核对能稳定改善成本与完成率。**模型结束、文件落盘、验收通过和事实正确分别判断，不将框架成功状态当作任务正确性的保证。**
+当前所有本项目的Agent入口统一使用LangGraph内部循环；AI SDK仅负责单次模型请求与DeepSeek适配。Python手写循环及Vercel ToolLoopAgent实现已删除，历史对照记录保留。定向阅读支持快照全文检索、原文回读、程序验收和可选独立模型核对，但没有证明新框架或额外核对能稳定改善成本与完成率。**模型结束、文件落盘、验收通过和事实正确分别判断，不将框架成功状态当作任务正确性的保证。**
 
-统一交互入口：`cd vercel_agent && npm run person`。单任务入口：`npm run harness -- <skill> "任务"`；可选内部图循环：`npm run harness:langgraph -- <skill> "任务"`。
+统一交互入口：`cd vercel_agent && npm run person`。单任务入口：`npm run harness -- <skill> "任务"`，同样使用LangGraph；`harness:langgraph`保留为兼容别名。
 
 ## 能做什么
 
@@ -29,12 +29,10 @@ flowchart TD
     D --> R[TaskRouter：启动进程与独立工作目录]
     R --> H
     R --> X[Codex CLI：原生执行循环]
-    H --> L[Vercel AI SDK Loop + DeepSeek]
-    H --> G[可选 LangGraph 模型/工具节点循环]
-    G --> B
-    L --> B[JSON Lines 子进程桥接]
+    H --> G[LangGraph：上下文 / 模型 / 工具 / 结束]
+    G --> M[AI SDK generateText + DeepSeek]
+    G --> B[JSON Lines 子进程桥接]
     B --> T[Python 工具注册表与参数校验]
-    P[Python 手写 Loop：学习与对照] --> T
     T --> S[搜索 / 网页与数据 / 计算 / 视觉 / Obsidian]
     H --> V[运行记录与自动检查]
     X --> V
@@ -48,7 +46,7 @@ flowchart TD
 - **任务中心** 校验分类字段，在已注册且能力匹配的候选中按规则选择执行端，管理队列与最多一次失败升级。
 - **TaskRouter** 接收已选定的执行端，创建工作目录、启动进程、执行超时/取消并收回结果；它不再独立分析任务。
 
-执行端保留各自的模型和工具。主 Agent 的请求预算不能限制 Codex 内部全部用量；当前没有统一金额硬上限。
+DeepSeek主入口和执行端统一使用LangGraph；Codex CLI仍使用自身的执行循环和工具。主 Agent 的请求预算不能限制 Codex 内部全部用量；当前没有统一金额硬上限。
 
 ## 快速开始
 
@@ -170,7 +168,7 @@ npm run router -- runs --limit 10
 
 ## 验证证据
 
-最近记录（**2026-10-10**）：143项TypeScript测试、86项Python测试通过，TypeScript类型检查通过。离线测试验证执行机制，不代表真实模型任务都能成功。
+最近迁移验收（**2026-10-11**）：126项TypeScript测试、76项Python测试及类型检查通过。旧循环专项与重复测试已删除，仍覆盖预算、上下文、参数修正、任务中心和图循环；真实CLI计算任务也通过。详细范围见[迁移说明](vercel_agent/LANGGRAPH.md)。离线测试验证执行机制，不代表真实模型任务都能成功。
 
 | 验证 | 实际观察 | 证据与边界 |
 | --- | --- | --- |
@@ -189,7 +187,7 @@ npm run router -- runs --limit 10
 | LangGraph：检索＋程序验收 | 8/12 | 256,328 | 8.27秒 |
 | LangGraph：检索＋程序验收＋独立模型核对 | 9/12 | 261,027 | 8.99秒 |
 
-关闭模型核对总体tokens下降约1.8%，但严格完成率下降；单看博客组，tokens反而增加约1.9%。数据组均6/6通过，本来不调用核对模型。独立模型核对也漏判一次恢复步骤顺序错误。本批没有证明关闭核对能够保持完成效果并稳定节省预算，样本不足以证明统计等效性，默认执行器保持原Vercel循环，阅读约定入口默认保留semantic核对。
+关闭模型核对总体tokens下降约1.8%，但严格完成率下降；单看博客组，tokens反而增加约1.9%。数据组均6/6通过，本来不调用核对模型。独立模型核对也漏判一次恢复步骤顺序错误。本批没有证明关闭核对能够保持完成效果并稳定节省预算，样本不足以证明统计等效性，以上是迁移前对照，不能用于宣称本次迁移提高完成率。当前按项目选择统一LangGraph循环，沿用原Harness策略；仅显式传入阅读约定时启用阅读验收，默认semantic核对仍仅属于该选项。
 
 [三组完整报告](reports/evidence-ablation-validation.md)记录任务、预算、验收、基础设施故障批次排除和失败分析；[此前24次阅读对照](reports/evidence-reading-validation.md)单独保留，不混算不同批次。使用方式见[LangGraph说明](vercel_agent/LANGGRAPH.md)。这些定向阅读实验不代表已经解决整篇长论文阅读。
 
@@ -203,15 +201,15 @@ npm test
 npm run typecheck
 ```
 
-真实 API 验证入口包括 `verify:search`、`verify:obsidian`、`verify:context` 和 `compare`，会产生模型用量。部分预算与上下文对比脚本依赖 Git 忽略的本机快照/数据清单；克隆仓库后不能直接重放这些实验。报告保留实验控制、结果和限制，原始运行目录中的本机绝对路径也不能在其他机器直接打开。
+真实 API 验证入口包括 `verify:search`、`verify:obsidian`、`verify:context`，会产生模型用量。部分预算与上下文对比脚本依赖 Git 忽略的本机快照/数据清单；克隆仓库后不能直接重放这些实验。报告保留实验控制、结果和限制，原始运行目录中的本机绝对路径也不能在其他机器直接打开。
 
 ## 代码导航
 
 | 位置 | 阅读重点 |
 | --- | --- |
-| [agent.py](agent.py)、[runtime.py](runtime.py) | 手写循环、预算计数、错误传播与用量记录 |
+| [agent_config.py](agent_config.py)、[runtime.py](runtime.py) | 原提示词和默认预算、工具内模型用量与预算计数 |
 | [tools.py](tools.py)、[tool_library/](tool_library/) | 工具定义、参数模型与共享执行器 |
-| [vercel_agent/agent.ts](vercel_agent/agent.ts)、[bridge.ts](vercel_agent/bridge.ts) | SDK 循环、请求前维护与 Python 子进程桥接 |
+| [execution_runtime.ts](vercel_agent/execution_runtime.ts)、[bridge.ts](vercel_agent/bridge.ts) | 计量HTTP适配、原上下文策略与Python子进程桥接；不包含独立循环 |
 | [harness.ts](vercel_agent/harness.ts)、[skills/](skills/) | Skill 加载、任务隔离、运行结束与任务验收 |
 | [person_cli.ts](vercel_agent/person_cli.ts)、[task-coordinator](skills/task-coordinator/SKILL.md) | 主Agent入口、分类指令、通知和产物审阅 |
 | [task_center.ts](vercel_agent/task_center.ts)、[task_router.ts](vercel_agent/task_router.ts) | 能力筛选、分层路由、队列、取消、失败升级与产物回收 |

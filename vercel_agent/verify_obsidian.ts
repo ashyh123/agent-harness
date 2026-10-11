@@ -4,7 +4,7 @@ import { createHash, randomInt } from 'node:crypto';
 import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { MinimalHarness } from './harness.js';
-import type { Configuration } from './agent.js';
+import type { Configuration } from './execution_runtime.js';
 import { PythonBridge, ROOT, loadLocalEnv, redact } from './bridge.js';
 
 const candidates = [

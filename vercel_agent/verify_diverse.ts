@@ -1,7 +1,8 @@
 /** 固定两倍预算/较晚压缩；重复旧题，并增加数据与长上下文任务。 */
 import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
-import { VercelLoop, type Configuration } from './agent.js';
+import { LangGraphLoop } from './langgraph_loop.js';
+import type { Configuration } from './execution_runtime.js';
 import { PythonBridge, ROOT, loadLocalEnv, redact } from './bridge.js';
 import { readingChecks, scaledBudget, type ReadingCase } from './budget_eval.js';
 import { dataChecks, longReadingChecks, type DataCase } from './diverse_eval.js';
@@ -91,7 +92,7 @@ async function main() {
         const started = Date.now();
         console.log(`开始 ${id}`);
         try {
-          const result = await new VercelLoop(runBridge, config).run([{ role: 'user', content: task.prompt }], {
+          const result = await new LangGraphLoop(runBridge, config).run([{ role: 'user', content: task.prompt }], {
             onNotice: notice => console.log(`${id}: ${redact(notice)}`),
           });
           let checks: any;

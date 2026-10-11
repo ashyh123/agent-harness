@@ -4,7 +4,8 @@ import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { VercelLoop, type Configuration } from './agent.js';
+import { LangGraphLoop } from './langgraph_loop.js';
+import type { Configuration } from './execution_runtime.js';
 import { PythonBridge, ROOT, loadLocalEnv, redact } from './bridge.js';
 import { readingChecks, readingPrompt, scaledBudget, type Fact, type ReadingCase } from './budget_eval.js';
 
@@ -117,7 +118,7 @@ async function main() {
         const id = `${task.id}-${multiplier}x-r${repeat}`;
         console.log(`开始 ${id}`);
         try {
-          const result = await new VercelLoop(bridge, config).run([{ role: 'user', content: task.prompt }], {
+          const result = await new LangGraphLoop(bridge, config).run([{ role: 'user', content: task.prompt }], {
             onNotice: notice => console.log(`${id}：${redact(notice)}`),
           });
           const toolEvents = result.events.filter(event => event.type === 'tool');

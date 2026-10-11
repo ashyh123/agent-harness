@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { VercelLoop, type Configuration } from '../agent.js';
+import { LangGraphLoop } from '../langgraph_loop.js';
+import type { Configuration } from '../execution_runtime.js';
 import { PythonBridge } from '../bridge.js';
 
 test('扩大预算实际穿过第六次请求，压缩和输出恢复不能绕过新的硬上限', async t => {
@@ -18,7 +19,7 @@ test('扩大预算实际穿过第六次请求，压缩和输出恢复不能绕�
       usage: { prompt_tokens: 10, completion_tokens: 5, total_tokens: 15 },
     }), { headers: { 'content-type': 'application/json' } });
   };
-  const result = await new VercelLoop(bridge, { ...config, max_steps: 10, max_model_requests: 16,
+  const result = await new LangGraphLoop(bridge, { ...config, max_steps: 10, max_model_requests: 16,
     max_tool_calls: 16, max_seconds: 180 }, fetcher).run([{ role: 'user', content: '测试扩大预算' }]);
   assert.equal(result.error, null);
   assert.equal(result.model_requests, 6);
