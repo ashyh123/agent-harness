@@ -1,4 +1,5 @@
 .venv/
+.venv-mcp/
 .env
 .env.*
 !.env.example
@@ -6,16 +7,6 @@ __pycache__/
 *.pyc
 .DS_Store
 .commandcode/
-reports/last-run.json
-reports/module-6-3-browser-source.json
 node_modules/
-reports/vercel-last-run.json
-reports/harness/
-reports/webpage-snapshots/
-reports/search-reliability-runs/
-reports/context-compaction-runs/
-reports/context-strategy-runs/
-reports/obsidian-runs/
-reports/budget-runs/
-reports/langgraph-runs/
-reports/routing-model-runs/
+# Generated run traces, validation reports, and cached webpage sources.
+reports/

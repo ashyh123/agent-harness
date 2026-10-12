@@ -25,7 +25,16 @@
     "verify:diverse": "tsx verify_diverse.ts",
     "test": "tsx --test tests/*.test.ts",
     "typecheck": "tsc --noEmit",
-    "langgraph": "node --import tsx langgraph_cli.ts"
+    "langgraph": "node --import tsx langgraph_cli.ts",
+    "blog": "tsx blog_cli.ts",
+    "blog:workflow": "tsx blog_workflow_cli.ts",
+    "verify:blog-workflow": "tsx verify_blog_workflow.ts",
+    "verify:blog-acceptance": "tsx verify_blog_acceptance.ts",
+    "blog:agent": "tsx blog_agent_cli.ts",
+    "blog:index": "tsx obsidian_knowledge_cli.ts",
+    "verify:omp-blog": "tsx verify_omp_blog.ts",
+    "collect": "tsx collect_cli.ts",
+    "omp:install-collect": "tsx install_omp_collect.ts"
   },
   "dependencies": {
     "@ai-sdk/deepseek": "3.0.61",

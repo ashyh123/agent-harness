@@ -22,9 +22,9 @@ npm run harness:langgraph -- --no-critic --contract examples/blog-questions.json
 
 `--no-critic` 对应任务输入的 `readingReview: "structural"`：validate通过后直接进入finish；默认仍为semantic。来源、逐字引文、格式和问题覆盖检查保持，但程序不判断引文是否支持答案，语义仍需人工核对。运行记录保存reading_review，工具与模型请求轨迹可核对是否实际跳过critic。
 
-新增36次同批三组消融：原Harness严格9/12，程序验收8/12，程序验收＋模型核对人工复核后9/12。关闭核对总体tokens仅下降1.80%，博客组反而增加1.90%，未证明保持完成效果并节省预算；当时默认未切换，此次按项目选择统一内部循环。见[三组消融报告](../reports/evidence-ablation-validation.md)。
+新增36次同批三组消融：原Harness严格9/12，程序验收8/12，程序验收＋模型核对人工复核后9/12。关闭核对总体tokens仅下降1.80%，博客组反而增加1.90%，未证明保持完成效果并节省预算；当时默认未切换，此次按项目选择统一内部循环。
 
-24次真实对照，自动严格通过8/12→11/12，人工复核8/12→10/12，总tokens增加50.26%。独立核对漏判了一次恢复步骤顺序错误，另有一次格式修正耗尽预算。该结论来自迁移前可选入口；见[完整结果与边界](../reports/evidence-reading-validation.md)。
+24次真实对照，自动严格通过8/12→11/12，人工复核8/12→10/12，总tokens增加50.26%。独立核对漏判了一次恢复步骤顺序错误，另有一次格式修正耗尽预算。该结论来自迁移前可选入口。
 
 `npm run harness:langgraph` 通过 `langgraph_loop.ts` 的 StateGraph 执行任务。图节点分别准备上下文、请求一次模型、执行工具、结束；模型提出工具调用后，图负责把对应结果加入上下文并继续请求。模型节点使用 AI SDK 的 `generateText` 适配 DeepSeek，但不使用 `ToolLoopAgent`，也不调用原 `VercelLoop`。工具执行只发生在图的 tools 节点。
 
@@ -47,7 +47,7 @@ npm run harness:langgraph -- webpage-reader '阅读指定网页并核对来源'
 npm run chat -- "使用calculate计算123乘456"
 ```
 
-两种内部循环共用预算、工具、上下文维护、Skill 和日志。24次真实博客/JSON/CSV实验，两组均严格通过6/12，LangGraph总tokens多8.68%，没有证明更优；该结果不证明本次统一迁移具有性能收益。详见[内部执行对照报告](../reports/langgraph-execution-validation.md)。图内有节点轨迹，但没有接入checkpointer，不支持模型步/工具步的进程崩溃恢复。
+两种内部循环共用预算、工具、上下文维护、Skill 和日志。24次真实博客/JSON/CSV实验，两组均严格通过6/12，LangGraph总tokens多8.68%，没有证明更优；该结果不证明本次统一迁移具有性能收益。图内有节点轨迹，但没有接入checkpointer，不支持模型步/工具步的进程崩溃恢复。
 
 ## 外层任务阶段执行后端
 
@@ -104,7 +104,7 @@ npm test
 
 旧外层包装对照脚本已移除，以下为历史实验说明，当前回归验证使用上面的测试命令。历史对照复用相同 Skill、任务、calculate、配置和输出，正常预算/一请求故意失败档各重复三次，交替两组执行顺序。每次保存独立 Harness 记录和 comparison.json；记录实际执行耗时、工具轨迹、重复调用、模拟 tokens。评测脚本中的自动批准仅用于受控计算实验；真实交互入口仍需显式 approve/reject。成本记为 null，fixture tokens 不是计费证据。评测脚本不是通用算式评测，也不能说明真实模型稳定性。
 
-结果及简历描述见 [验证报告](../reports/langgraph-validation.md)。原长文 offload-recovery 严格验收仍为 0/4，本任务不改变该结论。
+原长文 offload-recovery 严格验收仍为 0/4，本任务不改变该结论。
 
 参考：LangGraph 官方 [持久化](https://docs.langchain.com/oss/javascript/langgraph/persistence) 和 [interrupt 恢复语义](https://docs.langchain.com/oss/javascript/langgraph/interrupts)。本地依赖固定为 @langchain/langgraph 1.4.21、SQLite checkpointer 1.0.4；LangChain core 是框架依赖，没有宣称实现了 LangChain Agent 或迁移模型 provider。
 

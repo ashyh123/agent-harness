@@ -1,0 +1,10 @@
+[
+ {"id":"effective-agents","path":"文章卡片/effective-agents.md","url":"https://www.anthropic.com/research/building-effective-agents"},
+ {"id":"context-engineering","path":"文章卡片/context-engineering.md","url":"https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"},
+ {"id":"writing-tools","path":"文章卡片/writing-tools.md","url":"https://www.anthropic.com/engineering/writing-tools-for-agents"},
+ {"id":"think-tool","path":"文章卡片/think-tool.md","url":"https://www.anthropic.com/engineering/claude-think-tool"},
+ {"id":"multi-agent","path":"文章卡片/multi-agent.md","url":"https://www.anthropic.com/engineering/multi-agent-research-system"},
+ {"id":"managed-agents","path":"文章卡片/managed-agents.md","url":"https://www.anthropic.com/engineering/managed-agents"},
+ {"id":"structured-outputs","path":"文章卡片/structured-outputs.md","url":"https://openai.com/index/introducing-structured-outputs-in-the-api/"},
+ {"id":"gemini-background","path":"文章卡片/gemini-background.md","url":"https://blog.google/innovation-and-ai/technology/developers-tools/expanding-managed-agents-gemini-api/"}
+]

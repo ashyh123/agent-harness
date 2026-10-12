@@ -4,6 +4,7 @@ import { generateText, type ModelMessage } from 'ai';
 import { createExecutionRuntime, type Configuration, type RunResult, type ToolCompletion } from './execution_runtime.js';
 import { PythonBridge, BridgeError } from './bridge.js';
 import { ContextError } from './context.js';
+import { blogSaveGuard } from './blog_evidence.js';
 import { checkReading, checkCritic, CRITIC_INSTRUCTIONS, validateReadingContract,
   ReadingValidationError, type ReadingContract, type ReadingValidation } from './reading_validation.js';
 
@@ -21,7 +22,9 @@ export class LangGraphLoop {
 
   async run(messages: ModelMessage[], options: { fixtures?: Record<string, unknown>; limits?: Record<string, number>;
     maxRetries?: number; onNotice?: (notice: string) => void; toolCompletion?: ToolCompletion;
-    readingContract?: ReadingContract; readingReview?: 'structural' | 'semantic' } = {}): Promise<RunResult> {
+    readingContract?: ReadingContract; readingReview?: 'structural' | 'semantic';
+    beforeTool?: (call: { toolName: string; input: any }, runtime: ReturnType<typeof createExecutionRuntime>)
+      => Promise<{ code: string; message: string } | null> } = {}): Promise<RunResult> {
     if (options.readingContract) validateReadingContract(options.readingContract);
     if (options.readingContract && options.toolCompletion)
       throw new ReadingValidationError('阅读验收不能与工具收据提前结束同时启用');
@@ -29,6 +32,7 @@ export class LangGraphLoop {
       max_tool_calls: this.config.max_tool_calls, max_seconds: this.config.max_seconds, ...options.limits };
     await this.bridge.request('start', { fixtures: options.fixtures, limits });
     const runtime = createExecutionRuntime(this.bridge, this.config, this.fetcher, options);
+    const guard = blogSaveGuard(this.bridge, this.config);
     const policy = runtime.policy;
     const sdkSteps: any[] = [];
     let compact = false;
@@ -79,8 +83,16 @@ export class LangGraphLoop {
           if (call.invalid || !this.config.tools.some(t=>t.name===call.toolName)) {
             output = await this.bridge.request('invalid_tool', { name: call.toolName, arguments: call.input, tool_call_id: call.toolCallId });
           } else {
-            output = await this.bridge.request('call_tool', { name: call.toolName, arguments: call.input,
-              tool_call_id: call.toolCallId });
+            let rejection;
+            try {
+              rejection = await guard(call, runtime);
+              if (!rejection) rejection = await options.beforeTool?.(call, runtime);
+            }
+            finally { runtime.setModelKind(compact ? 'vercel_compact_retry' : 'vercel'); }
+            output = await this.bridge.request(rejection ? 'reject_tool' : 'call_tool', {
+              name: call.toolName, arguments: call.input, tool_call_id: call.toolCallId,
+              ...(rejection ? { rejection } : {}),
+            });
           }
           outputs.push({ type: 'tool-result', toolCallId: call.toolCallId, toolName: call.toolName,
             output: { type: 'json', value: output } });

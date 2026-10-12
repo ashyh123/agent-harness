@@ -71,6 +71,20 @@ class Worker:
         if self.context is None:
             raise RuntimeError("请先开始一轮运行")
         context = self.context
+        if operation == "record_blog_review":
+            context.events.append({"type": "blog_review", "document_id": request["document_id"],
+                                   "review": request["review"]})
+            return {"recorded": True}
+        if operation == "reject_tool":
+            context.remaining_seconds()
+            if context.tool_calls >= context.max_tool_calls:
+                raise BudgetExceeded("已达到本轮工具调用上限")
+            context.tool_calls += 1
+            result = {"error": request["rejection"]}
+            context.events.append({"type": "tool", "name": request["name"],
+                                   "arguments": request["arguments"], "tool_call_id": request["tool_call_id"],
+                                   "result": result, "elapsed_seconds": 0})
+            return result
         if operation == "validate_tool":
             try:
                 value = self.registry[request["name"]].parameters.model_validate(request["arguments"])

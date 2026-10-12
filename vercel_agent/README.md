@@ -1,4 +1,6 @@
-# LangGraph Agent：沿用原Harness策略
+# Agent 工程实验与 OMP 学习入口
+
+日常收录使用 OMP `/collect URL`：最多1800字符的短预览、一次简介请求、保存待阅读文章卡片。正文和关联由用户维护，重复收录保持原样。`/skill:obsidian-study 任务` 使用原生搜索和读取工具取用 Obsidian。安装与验收见 [OMP_COLLECT.md](OMP_COLLECT.md)。下方 LangGraph 与预算对照是保留的工程实验入口。
 
 本项目的chat、Harness、主Agent及DeepSeek执行端统一使用`LangGraphLoop`。原Python循环和Vercel ToolLoopAgent实现已移除；AI SDK仅负责单次非流式模型请求。上下文默认legacy、提示词、预算、工具、Skill、任务记录和产物检查沿用原Harness。Codex委派端保持自身原生循环。
 
@@ -6,15 +8,15 @@
 
 此前SDK/手写/图循环的对照为历史实验，结果与迁移后的默认行为分开；旧实现已删除，相关比较脚本不再提供，需在Git提交`246b5e7`查看原实现。详细流程和可选阅读验收见[LANGGRAPH.md](LANGGRAPH.md)。
 
-已加入借鉴OMP shake的实验性 `artifact_offload` 上下文选项：本地将大网页结果替换为原文回查信息，省去摘要请求，复用已有快照与工具。`npm run verify:offload -- 2` 在原预算/两倍预算下与默认策略配对。24次实测没有证明它能改善长文任务，默认仍为legacy；见 [实现、失败原因与结果](../reports/offload-context-validation.md)。
+已加入借鉴OMP shake的实验性 `artifact_offload` 上下文选项：本地将大网页结果替换为原文回查信息，省去摘要请求，复用已有快照与工具。`npm run verify:offload -- 2` 在原预算/两倍预算下与默认策略配对。24次实测没有证明它能改善长文任务，默认仍为legacy。
 
-需要给不同 Agent 发布任务并收回文件时，使用新增的 [统一任务入口](ROUTER.md)：`npm run router -- agents`、`npm run router -- run --agent codex "任务"`。此入口手动选择 Harness 或 Codex CLI，各自保留原来的工具和内部循环；验证见 [任务入口实测](../reports/task-router-validation.md)。
+需要给不同 Agent 发布任务并收回文件时，使用新增的 [统一任务入口](ROUTER.md)：`npm run router -- agents`、`npm run router -- run --agent codex "任务"`。此入口手动选择 Harness 或 Codex CLI，各自保留原来的工具和内部循环。
 
 默认工具为九个，由Python注册表提供。`read_saved_webpage`回查原文，`search_saved_webpage`用FTS5/BM25定位快照，`save_obsidian_blog`写入专属vault；`read_data`/`query_data`处理本轮JSON/CSV。
 
-预算配置已贯通 SDK 与 Python 桥接：单次运行的 `Configuration.max_steps` 和其他预算会传入执行层，输出恢复和压缩也占用该上限。`npm run verify:budget -- 2` 真实比较 2 倍/3 倍预算，各重复两轮；`npm run verify:budget -- 2 - roomy` 增加上下文阈值对照，避免资料仍在本地安全容量内时过早压缩。默认配置不由实验修改。[48 次实测结果](../reports/budget-comparison-validation.md)；此实验同时扩展请求、工具、耗时与输出上限，不是仅请求次数的因果实验。
+预算配置已贯通 SDK 与 Python 桥接：单次运行的 `Configuration.max_steps` 和其他预算会传入执行层，输出恢复和压缩也占用该上限。`npm run verify:budget -- 2` 真实比较 2 倍/3 倍预算，各重复两轮；`npm run verify:budget -- 2 - roomy` 增加上下文阈值对照，避免资料仍在本地安全容量内时过早压缩。默认配置不由实验修改。此实验同时扩展请求、工具、耗时与输出上限，不是仅请求次数的因果实验。
 
-`npm run verify:diverse` 在本机已准备的原文/数据基准上复验两倍预算＋50k较晚压缩，增加NOAA/NASA数据提取、单位与缺失值、跨来源计算、HTML表格、搜索、JSON/CSV边界及双论文压力任务，各重复两次。[30次多样任务实测](../reports/diverse-budget-validation.md)。原始准备材料保存在Git忽略的 `reports/budget-runs`；该入口需要这些本机材料，可显式传旧实验目录和数据源JSON。`npm run verify:diverse -- --review-only <experiment-directory>` 只离线复核已有运行。
+`npm run verify:diverse -- <experiment-directory> <sources.json>` 可复验两倍预算与较晚压缩下的多样任务。历史输入和运行记录已清理，此入口须自行准备包含 `manifest.json` 的实验目录与数据源 JSON。`npm run verify:diverse -- --review-only <experiment-directory>` 可离线复核新生成的运行。
 
 共享 `web_search` 现在优先调用 Tavily 官方 Python SDK 的免费 keyless 模式，失败后尝试 DuckDuckGo、Yahoo；无需新增密钥。运行 `npm run verify:search` 验证真实搜索与两篇阅读，记录各次实际 provider，并检查阅读 URL 来自搜索结果。`@tavily/ai-sdk@0.5.0` 当前只声明兼容 AI SDK 5/6，未直接安装到本项目 AI SDK 7；使用原桥接保留两版共享工具及预算。Keyless 模式有速率限制，不保证所有查询都成功。
 
@@ -80,7 +82,7 @@ SDK 和 Harness 另外启用累计上下文压缩，Python 手写 Loop 暂不具
 
 压缩开始和完成均由 CLI/Harness 即时通知，无需用户确认。摘要实际请求记录为 `vercel_context_compaction`，计入同一份 5 次外层、8 次总模型请求及时间预算，并计入实际用量；开始前必须留够摘要和继续执行各一次。摘要截断、失败、固定任务/指令过大或没有压缩到目标容量时停止，原成功历史不被替换。只有任务运行成功才提交压缩历史，下一轮沿用；完整工具证据继续保存在 trace，自动引文检查仍核对实际工具返回，不能用摘要批准引文。
 
-运行 `npm run verify:context` 可用两篇真实博客验证，会产生模型用量，保存到独立的 `reports/context-compaction-runs/`。运行记录含 `context_policy`、`context_compactions`、`notices`，与输出长度恢复的 `compact_retry_used` 分开。验证与已发现的阅读覆盖问题见 [记录](../reports/context-compaction-validation.md)。
+运行 `npm run verify:context` 可用两篇真实博客验证，会产生模型用量，保存到独立的 `reports/context-compaction-runs/`。运行记录含 `context_policy`、`context_compactions`、`notices`，与输出长度恢复的 `compact_retry_used` 分开。
 
 ### 实验性任务状态与近期窗口
 
@@ -99,15 +101,15 @@ npm run verify:context-strategy -- 3 fit development
 npm run verify:context-strategy -- 3 fit holdout
 ```
 
-这些命令调用真实模型，复用已有公共网页快照，需要 `reports/budget-runs/sources.json` 与对应快照。不会重新下载或写入 Obsidian。原始清单、回答、评分及决策保存到 `reports/context-strategy-runs/`，不覆盖旧记录。采用条件在 `context_eval.ts` 中；详见[完整对照报告](../reports/context-strategy-validation.md)。
+这些命令调用真实模型，复用已有公共网页快照，需要 `vercel_agent/fixtures/reading-sources.json` 与对应快照。不会重新下载或写入 Obsidian。原始清单、回答、评分及决策保存到 `reports/context-strategy-runs/`，不覆盖旧记录。采用条件在 `context_eval.ts` 中。
 
-`npm run verify:targeted-context -- 3` 以另一种明确目标验收：单篇评测博客的三个事实问题，允许按需阅读，要求答案、来源限定及实际读到的引文均合格。原执行预算与两倍档各重复三次，每档内部只切换上下文策略；两档正常输出均512、摘要上限1024，公共容量均20000/14000。覆盖率只作诊断，旧全文评分不变。[12次按需阅读结果](../reports/targeted-context-validation.md)：旧策略两档均3/3，新策略分别2/3、3/3，因此仍不切换默认。该入口需要已有评测博客快照；复验不等于新的留出验证，也不验证生产默认12000/8500容量。
+`npm run verify:targeted-context -- 3` 以另一种明确目标验收：单篇评测博客的三个事实问题，允许按需阅读，要求答案、来源限定及实际读到的引文均合格。原执行预算与两倍档各重复三次，每档内部只切换上下文策略；两档正常输出均512、摘要上限1024，公共容量均20000/14000。覆盖率只作诊断，旧全文评分不变。历史实验中：旧策略两档均3/3，新策略分别2/3、3/3，因此仍不切换默认。该入口需要已有评测博客快照；复验不等于新的留出验证，也不验证生产默认12000/8500容量。
 
 两版都限制每轮 5 次外层模型请求、8 次模型总请求（含视觉）、8 次工具尝试和 90 秒步骤启动预算；主模型每次最多输出 512 tokens，模型请求最多等待 30 秒，并按剩余时间缩短。与原版一样，总耗时不是强制杀掉进行中的工具请求。
 
 SDK 的默认 20 步、2 次失败重试调整为 5 步、0 次重试，工具顺序也显式沿用原注册表。每一次实际 HTTP 模型请求都会进入 Python 的共享预算；视觉工具也使用同一个 `RunContext`。
 
-单轮可通过 `agent.run(messages, { maxRetries: 1 })` 开启一次 SDK 原生模型请求重试；CLI 和对比脚本未传该选项，仍默认 0。重试复用当前步骤的请求消息，包括已有工具结果，不重启整个 Loop，也不会重新执行前一步已成功的工具。每次实际请求尝试仍占共享预算。HTTP 503 等可重试接口错误会走这条路径；当前本地 `AbortSignal.timeout()` 的 `TimeoutError` 不会触发 SDK 原生重试。离线证据见 [重试验证](../reports/vercel-sdk-retry-validation.md)。
+单轮可通过 `agent.run(messages, { maxRetries: 1 })` 开启一次 SDK 原生模型请求重试；CLI 和对比脚本未传该选项，仍默认 0。重试复用当前步骤的请求消息，包括已有工具结果，不重启整个 Loop，也不会重新执行前一步已成功的工具。每次实际请求尝试仍占共享预算。HTTP 503 等可重试接口错误会走这条路径；当前本地 `AbortSignal.timeout()` 的 `TimeoutError` 不会触发 SDK 原生重试。
 
 SDK 在执行前使用桥接的 Pydantic 校验；校验失败或未知工具生成 SDK 错误结果，仍计入工具尝试次数。正常工具错误（如除零）沿用原工具返回格式，交由模型解释。预算错误则必须终止任务，不能让模型把它当成可继续的业务错误。
 
@@ -119,18 +121,7 @@ SDK 可调度并行工具，本项目的 Python 桥接逐条执行请求，因�
 
 ## 对比与验证
 
-真实模型对比会产生 DeepSeek 用量：
-
-```sh
-npm run compare
-npm run compare -- '精确计算'
-```
-
-默认五组：精确计算、工具错误、网页搜索、指定网页总结、看图后计算。输出为根目录 `reports/vercel-sdk-comparison.json`，每个入口完成后即保存。指定单组运行会覆盖该报告，请先保留需要的旧记录。
-
-评估先真实抓取一次指定网页和一次 DuckDuckGo 搜索，两版收到相同的工具返回。评估重放时忽略具体查询措辞，搜索结果固定为该次抓取的内容，目的是控制资料差异；这不是两次独立实时搜索的性能评测。计算与视觉仍正常执行，视觉输出可能因模型采样不同而变化。两版请求先后顺序按场景交替，没有锁定模型随机种子，因此不能把单次差异归因于 SDK。
-
-详细结果与人工验收见 [对比报告](../reports/vercel-sdk-comparison.md)。
+原 SDK 与手写循环对比入口及历史报告已移除。
 
 验证指定网页事实表（真实模型调用，会产生用量）：
 
@@ -139,7 +130,7 @@ npm run verify:webpage
 npm run verify:webpage -- --clarify-history
 ```
 
-两轮使用同样的五主题验收标准，后一轮只澄清“历史”指存储本身的历史。分别保存到 `reports/module-6-3-sdk-facts.json` 和 `reports/module-6-3-sdk-facts-clarified.json`，重新运行会覆盖对应记录。脚本检查工具读取、表格、来源 URL 和引文匹配（忽略空白、不忽略标点）；语义正确性与覆盖完整性仍需人工判断。运行时 `manual_review` 标记待核对，本次人工验收见 [事实表验证](../reports/module-6-3-sdk-facts-evaluation.md)。
+两轮使用同样的五主题验收标准，后一轮只澄清“历史”指存储本身的历史。分别保存到 `reports/module-6-3-sdk-facts.json` 和 `reports/module-6-3-sdk-facts-clarified.json`，重新运行会覆盖对应记录。脚本检查工具读取、表格、来源 URL 和引文匹配（忽略空白、不忽略标点）；语义正确性与覆盖完整性仍需人工判断。运行时 `manual_review` 标记待核对。
 
 离线验证不访问模型或搜索服务，不读取 `.env`：
 
@@ -165,8 +156,8 @@ npm run typecheck
 当前代码只使用非流式生成，便于和原版比较。流式 UI、工具审批、持久化历史等可在之后有具体需求时再引入。
 
 
-本地移出恢复复测见 [offload-recovery-validation.md](../reports/offload-recovery-validation.md)：修复软目标误停、保护最新工具批次，并为硬容量不足接入预算内摘要恢复。长文复测仍未通过完整任务验收，默认保持 `legacy`。
+本地移出恢复复测：修复软目标误停、保护最新工具批次，并为硬容量不足接入预算内摘要恢复。长文复测仍未通过完整任务验收，默认保持 `legacy`。
 
 ## LangGraph 任务阶段后端
 
-现有 Harness 保留；新增 `npm run langgraph` 为 calculation-audit 提供明确状态、条件分支、SQLite 检查点、审批暂停与跨进程恢复。复用LangGraphLoop/PythonBridge 和原预算，恢复粒度为任务阶段。完整运行方式、幂等交付与无法恢复的边界见 [LANGGRAPH.md](LANGGRAPH.md)。离线对照及故障注入见 [验证报告](../reports/langgraph-validation.md)；另已完成 12 轮真实 DeepSeek 配对验证：正常预算两组各 3/3，故意预算不足两组各 0/3；新进程审批恢复未增加模型/工具调用。详见同一报告。
+现有 Harness 保留；新增 `npm run langgraph` 为 calculation-audit 提供明确状态、条件分支、SQLite 检查点、审批暂停与跨进程恢复。复用LangGraphLoop/PythonBridge 和原预算，恢复粒度为任务阶段。完整运行方式、幂等交付与无法恢复的边界见 [LANGGRAPH.md](LANGGRAPH.md)。此前真实配对运行中，新进程审批恢复未增加模型或工具调用。

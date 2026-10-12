@@ -41,7 +41,7 @@ text 去除加粗和链接目标等格式标记，仍保留列表、表格的组
 
 目前实现资料回查，并修复了两篇实际样本中已发现的六处列表/表格内容遗漏。SDK Loop 和 Harness 已加入累计上下文自动压缩，原 Python 手写 Loop 暂未加入；两版均没有完整会话恢复。当前原文指工具提取的文本，不是原始 HTML。快照会保留在本地，删除文件后相应 ID 无法回读；可用 `MINIMAL_AGENT_WEBPAGE_STORE_DIR` 指定存储目录。
 
-SDK 每次请求前估算当前输入容量（含指令、工具描述和输出预留），达到 12000 时自动生成工作摘要，目标不超过 8500；这是保守估算，不是模型的精确 token 计数。最新任务和系统/Skill 指令完整保留；程序保留文档 ID、来源、格式及回查区间，模型摘要承接事实、约束和未解决事项。压缩先通知用户，无需确认；压缩请求使用 1024 输出上限，计入原有模型次数和时间预算。已执行工具不重跑，成功后下一轮沿用压缩历史。摘要可能遗漏细节，精确事实仍需快照回查。预算不足、摘要截断或无法缩小输入时明确停止，不提交残缺历史。详见 [压缩实现与验证](../reports/context-compaction-validation.md)。
+SDK 每次请求前估算当前输入容量（含指令、工具描述和输出预留），达到 12000 时自动生成工作摘要，目标不超过 8500；这是保守估算，不是模型的精确 token 计数。最新任务和系统/Skill 指令完整保留；程序保留文档 ID、来源、格式及回查区间，模型摘要承接事实、约束和未解决事项。压缩先通知用户，无需确认；压缩请求使用 1024 输出上限，计入原有模型次数和时间预算。已执行工具不重跑，成功后下一轮沿用压缩历史。摘要可能遗漏细节，精确事实仍需快照回查。预算不足、摘要截断或无法缩小输入时明确停止，不提交残缺历史。
 
 验证“旧上下文移除后回查”，运行：
 
@@ -64,9 +64,9 @@ python examples/create_demo_image.py
 
 已加入 `obsidian-blog-reader` Skill，把已有阅读文件或新博客分析存入独立 Obsidian vault。Skill 负责读取、简化、启发和保存流程；`save_obsidian_blog` 负责实际写文件并回读。默认目录为 `~/Documents/Obsidian/Agent 博客阅读`，可通过 `MINIMAL_AGENT_OBSIDIAN_VAULT` 指定绝对路径。不会覆盖已有笔记；来源取自真实快照，引文须出现在本轮实际读取内容中。
 
-在 `vercel_agent` 中运行 `npm run harness -- obsidian-blog-reader "回查 document_id <实际ID>，简化分析并保存到 Obsidian"`。每次任务一篇，多篇逐篇运行；此 Skill 的 Harness 在工具返回真实保存并回读的收据后结束，无需再请求模型口头确认，语义验收仍为 `needs_review`。`npm run verify:obsidian` 随机从三家厂商各选一篇，真实采集后交给 Skill 分析快照，再检查 vault 中的实际文件，产生模型用量。详见 [实现与验证](../reports/obsidian-skill-validation.md)。
+在 `vercel_agent` 中运行 `npm run harness -- obsidian-blog-reader "回查 document_id <实际ID>，简化分析并保存到 Obsidian"`。每次任务一篇，多篇逐篇运行；此 Skill 的 Harness 在工具返回真实保存并回读的收据后结束，无需再请求模型口头确认，语义验收仍为 `needs_review`。`npm run verify:obsidian` 随机从三家厂商各选一篇，真实采集后交给 Skill 分析快照，再检查 vault 中的实际文件，产生模型用量。
 
-预算验收：在 `vercel_agent` 中运行 `npm run verify:budget -- 2`，比较当前配置的 2 倍与 3 倍上限，每任务重复两次；运行 `npm run verify:budget -- 2 - roomy` 使用相同任务、延后压缩的对照配置。测试三篇论文、一篇博客、六步计算和工具错误恢复，实际请求模型并产生用量。输出目录独立，记录全部成功和失败；`--review-only <实验目录>` 可离线复核。默认交互入口保持原配置，测试配置只作用于本次运行。[预算实验结果与限制](../reports/budget-comparison-validation.md)。
+预算验收：在 `vercel_agent` 中运行 `npm run verify:budget -- 2`，比较当前配置的 2 倍与 3 倍上限，每任务重复两次；运行 `npm run verify:budget -- 2 - roomy` 使用相同任务、延后压缩的对照配置。测试三篇论文、一篇博客、六步计算和工具错误恢复，实际请求模型并产生用量。输出目录独立，记录全部成功和失败；`--review-only <实验目录>` 可离线复核。默认交互入口保持原配置，测试配置只作用于本次运行。
 
 ```text
 agent_config.py        提示词和默认预算（不包含循环）
@@ -124,11 +124,7 @@ npm run verify:search
 npm run verify:obsidian
 ```
 
-原Python循环及evaluate_agent.py已删除，下列早期验收报告仅作历史记录。
-
-简化系统提示词后的验证见 `reports/compact-prompt-evaluation.md`。无搜索结果时仍发现模型补充未经核实的链接，来源要求目前依靠提示词，没有代码强制校验。
-
-输出截断后的自动精简恢复验证见 `reports/compact-retry-evaluation.md`。指定网页实测在 512 token 上限内自动恢复，但精简后的事实准确性仍需核对。
+原 Python 循环、evaluate_agent.py 及早期验收报告已删除。提示词不能保证来源准确，精简回答后的事实与覆盖范围仍需核对。
 
 ## 更换工具集合
 

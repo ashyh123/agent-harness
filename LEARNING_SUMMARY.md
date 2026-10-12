@@ -40,13 +40,7 @@
 - 使用课程模块 6.3 的网页进行原文核对与 Codex 对比。默认 512 token 输出上限曾导致回答截断，临时提高预算后能够完成回答。
 - 后续加入自动精简恢复，在默认 512 token 上限下通过一次额外请求返回精简答案，网页仍只读取一次。
 
-相关记录：
-
-- [四工具实现与验证](reports/tool-library-evaluation.md)
-- [简化提示词验证](reports/compact-prompt-evaluation.md)
-- [指定网页阅读对比](reports/module-6-3-comparison.md)
-- [自动精简恢复验证](reports/compact-retry-evaluation.md)
-- [历史失败记录](FAILURES.md)
+历史验证记录已清理，保留上述学习总结。
 
 ## 发现的问题与当前判断
 

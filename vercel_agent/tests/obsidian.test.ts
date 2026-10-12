@@ -45,6 +45,9 @@ test('Skill 通过真实 SDK 和工具读取、简化、实际落盘、回读并
       document_id: documentId, summary, takeaway: '我的推论：为工具循环保留事件记录，便于查错和复用结果。',
       evidence_quote: 'An agent uses tools in a loop.',
     })]);
+    else if (requests === 4) body = response(JSON.stringify({ checks:
+      ['summary_facts', 'quote_supports_core', 'takeaway_is_inference'].map(id => ({ id, verdict: 'supported', reason: '原文支持' })),
+      core_match: { claim: summary.slice(0, 10), evidence_field: 'evidence_quote' }, risk_checks: [] }));
     else {
       assert.fail('保存已回读核验后不应额外请求模型确认');
     }
@@ -56,7 +59,7 @@ test('Skill 通过真实 SDK 和工具读取、简化、实际落盘、回读并
   assert.equal(record.result?.completion_source, 'verified_tool');
   assert.equal(record.automatic_checks?.passed, true);
   assert.equal(record.task_verdict, 'needs_review');
-  assert.equal(record.result?.model_requests, 3);
+  assert.equal(record.result?.model_requests, 4);
   assert.equal(record.result?.tool_calls, 3);
   assert.equal(record.result?.context_compactions.length, 1, 'Skill 与来源索引保留后按剩余容量压缩，仍可实际保存');
   const saved = record.result!.events.find(event => event.name === 'save_obsidian_blog').result;

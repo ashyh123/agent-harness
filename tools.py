@@ -6,7 +6,8 @@ from typing import Annotated, Literal
 
 import httpx
 from openai import OpenAIError
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints, ValidationError
+from pydantic import BaseModel, Field, StringConstraints, ValidationError
+from tool_library.parameters import ToolParameters, QueryParameters, SearchParameters
 
 from runtime import BudgetExceeded, RunContext
 from tool_library.calculator import calculate
@@ -63,18 +64,6 @@ def read_note(filename):
         "content": content[:MAX_NOTE_CHARS],
         "truncated": len(content) > MAX_NOTE_CHARS,
     }
-
-
-class ToolParameters(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True, allow_inf_nan=False)
-
-
-class QueryParameters(ToolParameters):
-    query: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=200)]
-
-
-class SearchParameters(QueryParameters):
-    max_results: int = Field(default=3, ge=1, le=5)
 
 
 class WebpageParameters(ToolParameters):

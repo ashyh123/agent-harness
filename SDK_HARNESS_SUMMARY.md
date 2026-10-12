@@ -36,12 +36,8 @@ SDK 接管模型与工具反复交互的循环，并未改变核心原理；业�
 
 从实际任务失败推进：缺少操作能力时扩展工具；流程不稳定时调整 Skill；反复人工检查的确定性条件可以逐步接入程序验收。先保留当前最小结构，再根据证据决定要增加哪些工程机制。
 
-## 阅读与证据
+## 阅读与运行记录
 
 - [Harness 原理与运行方法](vercel_agent/HARNESS.md)
-- [SDK 与手写 Loop 对比](reports/vercel-sdk-comparison.md)
-- [只重试模型请求的验证](reports/vercel-sdk-retry-validation.md)
-- [网页事实表验收](reports/module-6-3-sdk-facts-evaluation.md)
-- [图表 Skill 验证与代码阅读路线](reports/chart-growth-skill-evaluation.md)
 
-`.env`、虚拟环境、node_modules 和每任务 `reports/harness/` 原始记录不提交。汇总报告及选定的验证 JSON 保留在版本中；汇总报告里指向被忽略的本地原始记录的链接，其他检出未必可用。
+历史验证记录已清理。测试代码仍可用于复测；新运行生成的 `reports/` 内容仅保留在本地，不进入 Git。`.env`、虚拟环境和 node_modules 也不提交。

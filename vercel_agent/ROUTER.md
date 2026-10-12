@@ -102,4 +102,4 @@ flowchart TD
     S --> U
 ```
 
-本地协议测试使用假 CLI，不调用模型；真实验收另见 [本次结果](../reports/task-router-validation.md)。
+本地协议测试使用假 CLI，不调用模型。

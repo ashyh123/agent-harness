@@ -14,11 +14,14 @@ async function main() {
     await reviewSaved(resolve(process.argv[3]));
     return;
   }
+  if (!process.argv[2] || !process.argv[3]) {
+    throw new Error('历史验证记录已清理；请显式提供实验目录与数据源 JSON：npm run verify:diverse -- <experiment-directory> <sources.json>');
+  }
   loadLocalEnv();
   if (!process.env.DEEPSEEK_API_KEY) throw new Error('请配置项目 .env');
-  const previous = process.argv[2] ? resolve(process.argv[2]) : join(ROOT, 'reports/budget-runs/paired-roomy-ECjPVX');
+  const previous = resolve(process.argv[2]);
   const old = JSON.parse(await readFile(join(previous, 'manifest.json'), 'utf8'));
-  const probePath = process.argv[3] ? resolve(process.argv[3]) : join(ROOT, 'reports/budget-runs/diverse-sources.json');
+  const probePath = resolve(process.argv[3]);
   const probes = JSON.parse(await readFile(probePath, 'utf8'));
   old.input_sources = old.input_sources.map((row: ReadingCase) => ({ ...row, facts: gold[row.id] }));
   const source = (id: string) => probes.find((row: any) => row.id === id);
@@ -76,6 +79,7 @@ async function main() {
   let config: Configuration;
   try { config = scaledBudget(await bridge.request('describe'), 2); } finally { bridge.close(); }
   config.context_policy = { trigger_tokens: 50000, target_tokens: 30000, max_input_tokens: 64000, summary_output_tokens: 1024 };
+  await mkdir(join(ROOT, 'reports/budget-runs'), { recursive: true });
   const directory = await mkdtemp(join(ROOT, 'reports/budget-runs/diverse-roomy-'));
   await mkdir(directory, { recursive: true });
   await writeFile(join(directory, 'manifest.json'), JSON.stringify({ prepared_at: new Date().toISOString(), repeats: 2,

@@ -113,7 +113,7 @@ flowchart TD
 5. task_router.ts、task_adapters.ts：原执行过程、事件观察和凭据隔离。
 6. 原agent.ts：SDK仍处理模型和工具的循环。
 
-离线和真实验收见 [任务中心验收](../reports/task-center-validation.md)。
+历史验收报告已清理，测试代码保留。
 
 ### Jev 分类实验
 
@@ -123,7 +123,7 @@ flowchart TD
 
 重复对照：`python3 vercel_agent/verify_hybrid_repeated.py`，四项新任务各三轮、两组交替，共24条真实流程；清单和验收事实在首次调用前保存。
 
-[三轮上下文修复对照报告](../reports/jev-context-validation.md)：本批两组均12/12完成，Jev未显示整体效率收益。
+历史实验中：本批两组均12/12完成，Jev未显示整体效率收益。
 
 ### Jev 独占分类实验
 

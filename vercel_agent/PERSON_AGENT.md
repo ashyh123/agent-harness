@@ -68,4 +68,4 @@ Person profile 保留外层五步、父模型总请求八次、工具八次和�
 5. `router_cli.ts` 的 `--json`、`--task-file -`：让工具与路由器交换结构化结果，避免解析终端说明文字。
 6. 原有 `agent.ts`：循环机制没有改；`context.ts` 仅增加子任务资料的索引保留，`checks.ts` 增加父流程的检查。
 
-验证见 [person agent 实测](../reports/person-agent-validation.md)。本地测试使用离线模型响应和假 Codex CLI；真实验收另行调用两个模型，记录成功与失败。
+本地测试使用离线模型响应和假 Codex CLI；真实验收另行调用两个模型，记录成功与失败。

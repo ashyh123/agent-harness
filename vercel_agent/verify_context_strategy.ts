@@ -31,14 +31,14 @@ async function main() {
   const skills = join(directory, 'skills');
   await mkdir(join(skills, 'context-evaluation'), { recursive: true });
   await writeFile(join(skills, 'context-evaluation/SKILL.md'), skill);
-  const sourceRows = JSON.parse(await readFile(join(ROOT, 'reports/budget-runs/sources.json'), 'utf8'));
+  const sourceRows = JSON.parse(await readFile(join(ROOT, 'vercel_agent/fixtures/reading-sources.json'), 'utf8'));
   const tasks: { id: string; prompt: string; reading?: ReadingCase; papers?: ReadingCase[] }[] = [];
   for (const id of suite === 'development' ? ['react', 'toolformer', 'research-blog'] : []) {
     const source = sourceRows.find((row: any) => row.id === id);
-    if (!source?.capture?.document_id) throw new Error(`缺少固定快照：${id}`);
-    const document = JSON.parse(await readFile(join(ROOT, 'reports/webpage-snapshots', source.capture.document_id + '.json'), 'utf8'));
+    if (!source?.document_id) throw new Error(`缺少固定快照：${id}`);
+    const document = JSON.parse(await readFile(join(ROOT, 'reports/webpage-snapshots', source.document_id + '.json'), 'utf8'));
     const text = document.text_content ?? document.content;
-    const reading: ReadingCase = { id, url: document.url, document_id: source.capture.document_id, text, sections: [], facts: gold[id] };
+    const reading: ReadingCase = { id, url: document.url, document_id: source.document_id, text, sections: [], facts: gold[id] };
     for (const fact of reading.facts) assert.match(text, new RegExp(fact.sourcePattern, 'i'), `${id}/${fact.id}基准不在快照内`);
     tasks.push({ id, prompt: readingPrompt(reading), reading });
   }
