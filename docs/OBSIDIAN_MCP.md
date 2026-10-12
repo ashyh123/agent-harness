@@ -24,6 +24,19 @@ OBSIDIAN_RETRIEVAL_METHOD=vector \
 
 服务配置 `OBSIDIAN_RETRIEVAL_METHOD=bm25|vector|hybrid`；请求可以显式覆盖method。日常默认使用vector，BM25和混合重排序可显式选择。两个本地神经模型由准备脚本预先下载，服务使用固定revision、CPU和本地文件，不自动下载，也不把笔记发送到外部Embedding接口。Cursor主模型仍会看到你主动检索与读取的内容。
 
+## OMP 原生接入
+
+```sh
+.venv-mcp/bin/python scripts/install_obsidian_omp.py
+omp
+# 在 OMP 中输入：
+# /skill:obsidian-study 结合我的笔记，给我学习 Agent 后台任务的两条建议和笔记链接。
+```
+
+安装器合并 `~/.omp/agent/mcp.json` 的 `obsidian-learning`（vector），同时安装指向实际 vault 的 `obsidian-study`。支持 `--agent-dir`、`PI_CODING_AGENT_DIR` 和 `--vault`。不读取项目 `.env`；`npm run omp:install-collect` 会加载 `.env` 后传递 vault。命名 profile 的目录可显式传 `--agent-dir ~/.omp/profiles/<name>/agent`。保留其他 MCP 服务，不更改 `config.yml` 的主模型与路由。
+
+OMP 工具注册名为 `mcp__obsidian_learning_search_obsidian` 和 `mcp__obsidian_learning_read_obsidian`。Skill 默认显式选择 vector，正文读取复用相对路径、位置和 hash。当前会话 `/mcp reload` 刷新服务、`/mcp list` 检查来源；重启可刷新 Skill。已有不同 Skill 需审阅后提供 `--previous-skill-sha256` 才更新，防止覆盖用户修改。实际任务结果见 [OMP 使用说明](../vercel_agent/OMP_COLLECT.md#mcp-接入后的验收)。配置与工具命名依据 [OMP 18.10.0 MCP 官方说明](https://github.com/can1357/oh-my-pi/blob/v18.10.0/docs/mcp-config.md)和[工具桥接源码](https://github.com/can1357/oh-my-pi/blob/v18.10.0/packages/coding-agent/src/mcp/tool-bridge.ts)。
+
 ## 两个工具
 
 FastMCP直接接收Pydantic对象，输入包在 `request` 中：

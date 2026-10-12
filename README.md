@@ -10,7 +10,7 @@
 
 ## Obsidian 只读 MCP 与检索
 
-已新增 FastMCP 服务，向 Cursor 提供 `search_obsidian` 和 `read_obsidian`。参数复用原工具库的严格 Pydantic 模型；日常检索默认使用免费本地 Embedding 的向量检索；BM25 和混合检索＋重排序保留为可选方式。返回笔记路径和精确定位，正文与链接保持只读。日常学习库与独立验收库分开。Cursor通过MCP使用此默认值；OMP的 `obsidian-study` 当前通过原生 `grep/read` 取用笔记。
+FastMCP 服务向 Cursor 和 OMP 提供 `search_obsidian` 和 `read_obsidian`。参数复用原工具库的严格 Pydantic 模型；日常检索默认使用免费本地 Embedding 的向量检索；BM25 和混合检索＋重排序保留为可选方式。返回笔记路径和精确定位，正文与链接保持只读。日常学习库与独立验收库分开。OMP 的 `obsidian-study` 通过原生 MCP 连接先做向量检索，再按路径和 hash 读取笔记。
 
 安装、Cursor 配置和检索对照见 [OBSIDIAN_MCP.md](docs/OBSIDIAN_MCP.md)。该功能扩展笔记取用能力，沿用现有 `/collect` 的文章卡片模式。
 
@@ -41,7 +41,7 @@
 | 能力 | 实现与交付 |
 | --- | --- |
 | 日常文章收录 | OMP `/collect`：短预览生成待阅读卡片，保留来源；重复收录不改动用户正文和链接 |
-| 学习库检索 | `obsidian-study` Skill 使用 OMP 原生 grep/read 按任务找笔记，区分自动简介与用户正文，回答附内部链接 |
+| 学习库检索 | `obsidian-study` Skill 使用 OMP 原生 MCP 做向量检索和正文读取，区分自动简介与用户正文，回答附内部链接 |
 | 共同概念图谱 | 博客CLI保存后建议共同概念，建立“博客→概念→博客”内部链接；同源分析版本合并为一个文章节点，保留关联依据 |
 | 工具调用 | 共享九个业务工具，支持网页回查、计算、JSON/CSV 解析查询和图片理解；参数通过 Pydantic 校验 |
 | Skill 驱动任务 | 显式加载本地 Skill，以同一套 Loop 执行网页阅读、计算核对、图表增长率等流程 |
@@ -129,7 +129,7 @@ npm run chat
 
 ## 演示流程
 
-日常使用 OMP 时，在 `vercel_agent` 运行一次 `npm run omp:install-collect`，重新打开 OMP。输入 `/collect https://博客地址` 新建待阅读文章卡片，在 Obsidian 的“我的笔记”写心得、“相关笔记”加入内部链接。需要复用时输入 `/skill:obsidian-study 结合我的笔记回答当前任务`。重复收录保留整个已有卡片，包括改名后的正文和链接。使用与本机验收见 [OMP_COLLECT.md](vercel_agent/OMP_COLLECT.md)。
+日常使用 OMP 时，先按 [MCP 安装说明](docs/OBSIDIAN_MCP.md)准备 `.venv-mcp` 与本地模型，再在 `vercel_agent` 运行一次 `npm run omp:install-collect`，重新打开 OMP。此命令同时安装 `/collect`、原生 MCP 和 `obsidian-study`。输入 `/collect https://博客地址` 新建待阅读文章卡片，在 Obsidian 的“我的笔记”写心得、“相关笔记”加入内部链接。需要复用时输入 `/skill:obsidian-study 结合我的笔记回答当前任务`。重复收录保留整个已有卡片，包括改名后的正文和链接。使用与本机验收见 [OMP_COLLECT.md](vercel_agent/OMP_COLLECT.md)。
 
 之前的深入分析与自动图谱入口仍保留： `cd vercel_agent && npm run blog -- "https://博客地址"`。保存成功后独立整理共同概念，额外用量单独显示。在Obsidian打开 `知识图谱/首页.md`，文章局部图谱深度设为2；全局图谱过滤 `path:"知识图谱"`。已有笔记可用 `npm run blog:index -- "/absolute/path/to/阅读笔记.md"` 补建关联。范围、保护机制及验收见 [OBSIDIAN_KNOWLEDGE.md](vercel_agent/OBSIDIAN_KNOWLEDGE.md)。
 

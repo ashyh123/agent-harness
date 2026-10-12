@@ -1,5 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { loadLocalEnv } from './bridge.js';
 loadLocalEnv();
 const root = process.env.PI_CODING_AGENT_DIR ?? join(process.env.HOME!, '.omp/agent');
@@ -17,13 +19,9 @@ const sameEncodedPath = content.replace(module, module.replace(/\+/g, '%2B'));
 if (existing !== null && existing !== content && existing !== sameEncodedPath)
   throw new Error(`已有不同扩展，未覆盖：${path}`);
 if (existing === null) await writeFile(path, content, { flag: 'wx' });
-const skillDirectory = join(root, 'skills/obsidian-study');
-const skillPath = join(skillDirectory, 'SKILL.md');
 const vault = process.env.MINIMAL_AGENT_OBSIDIAN_VAULT ?? join(process.env.HOME!, 'Documents/Obsidian/Agent 博客阅读');
-const skill = (await readFile(new URL('./omp-skills/obsidian-study/SKILL.md', import.meta.url), 'utf8'))
-  .replace('__VAULT_PATH__', vault);
-await mkdir(skillDirectory, { recursive: true });
-const oldSkill = await readFile(skillPath, 'utf8').catch(e => { if (e.code === 'ENOENT') return null; throw e; });
-if (oldSkill !== null && oldSkill !== skill) throw new Error(`已有不同 Skill，未覆盖：${skillPath}`);
-if (oldSkill === null) await writeFile(skillPath, skill, { flag: 'wx' });
-console.log(`已安装 /collect：${path}\n已安装 obsidian-study：${skillPath}\n重新启动 OMP 后使用 /collect URL，或 /skill:obsidian-study 你的学习任务`);
+const python = fileURLToPath(new URL('../.venv-mcp/bin/python', import.meta.url));
+const installer = fileURLToPath(new URL('../scripts/install_obsidian_omp.py', import.meta.url));
+// One installer owns both the native MCP definition and its corresponding skill.
+execFileSync(python, [installer, '--agent-dir', root, '--vault', vault], { stdio: 'inherit' });
+console.log(`已安装 /collect：${path}\n重新启动 OMP 后使用 /collect URL，或 /skill:obsidian-study 你的学习任务`);
